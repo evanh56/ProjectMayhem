@@ -1,0 +1,203 @@
+ PHASE 1: Foundations
+
+Choose a Broker/API:
+
+Examples: OANDA
+, FXCM
+, Alpaca
+, MetaTrader via MetaTrader5 Python API
+
+
+Make sure they allow paper (demo) trading via API.
+
+Learn the API:
+
+Pull historical OHLC data.
+
+Get live tick/price feed.
+
+Place buy/sell orders (paper/demo mode first).
+
+
+PHASE 2: Pattern Detection Logic
+
+Define your trading strategy:
+
+Example: If a “bullish engulfing pattern” forms on 1H chart + RSI < 30 → Buy.
+
+Use libraries like:
+
+pandas (for data manipulation)
+
+TA-Lib, pandas-ta, or btalib (for technical indicators)
+
+Custom logic for candlestick patterns
+
+Implement backtesting logic:
+
+Simulate how your strategy would have performed on past data.
+
+Libraries: backtrader, bt, or even custom code in pandas.
+
+
+
+
+
+PHASE 3: Automation Engine
+
+Build the bot:
+
+Check market every X minutes (via a loop or scheduler)
+
+Detect pattern
+
+Confirm other conditions (indicators, volume, etc.)
+
+Place trade with stop loss and take profit
+
+Log all activity
+
+Add risk management:
+
+Position sizing
+
+Max trades per day
+
+Max drawdown limits
+
+
+PHASE 4: Testing and Deployment
+
+Paper trading:
+
+Test your bot live in a demo environment.
+
+Log all trades, analyze performance.
+
+Live trading (optional):
+
+Switch to real account only after consistent results.
+
+Add logging, alerts (e.g., Telegram/email), error handling.
+
+
+PHASE 5: Machine Learning (optional/advanced)
+
+Use ML for signal generation or pattern detection:
+
+Label historical data: when your pattern happened and what outcome occurred.
+
+Train model (e.g., logistic regression, decision trees, LSTM for time series).
+
+Use predictions to guide trades.
+
+
+
+
+
+PLAN FOR PHASE 1: FOUNDATIONS
+_____________________________
+
+
+The broker/API that will be used for this project will be the MetaTrader5 API. The reason for using this broker is due to the free data that can be transcripted into any Python program. Comparing this to other costly API's, MT5 proves to be a more cost efficient program. 
+The following data will be covered in this section:
+1. Installing MT5 Python API Package
+2. Authentication
+3. Financial Data Extraction 
+
+
+ 		1. Installing MT5 Python API Package
+		____________________________________
+
+To download the MT5 Python API Package will be done using pip. With 'pip install MetaTrader5' or by following the link 'pypi.org/project/MetaTrader5/'.
+The code to install and login is as follows:
+
+	pip install MetaTrader5
+	import MetaTrader5 as mt
+	mt.initialise()
+	login = 
+	password = ''
+	server = ''
+	mt.login(login, password, server)
+
+		2. Authentication
+		_________________
+
+For full documentation of all functionalities of instructions that can be used, follow the address https://www.mql5.com/en/docs/python_metatrader5.
+
+		3. Financial Data Extraction 
+		____________________________
+
+Sample code in order to receive following rates of a desired stock/forex pair/etc is as follows:
+
+	from datetime import datetime
+	rates = mt.copy_rates_from('TSLA.NAS',mt.TIMEFRAME_D1,datetime.now(),100)
+	print(rates)
+
+		OR
+
+	from datetime import datetime
+	ticker = 'TSLA.NAS'
+	interval = mt.TIMEFRAME_D1 // Research to chance to minutes hence, mt.TIMEFRAME_M15 for 15m
+	no_of_rows = 100
+	rates = mt.copy_rates_from(ticker, interval, datetime.now(),no_of_rows)
+
+For further information regarding relevant basic instructions from MT5 API and how to implement them, click on the following link https://www.youtube.com/watch?v=XM0nAyVI0gA. 
+
+
+
+PLAN FOR PHASE 2: Pattern Detection Logic
+_________________________________________
+
+1. Library Usage 
+
+2. Project Developmental Plan
+
+
+		1. Library Usage 
+		________________
+
+Pandas - Excellent use for data manipulation. Standard library. Useful to analyse big data and make conclusions on statistical theory's. Highly regarded for its data analysis and manipulation capabilities. 
+Link: https://pandas.pydata.org/
+
+
+TA-Lib (Possibly but most likely not useful) - Can be used for analysis and recognition of candle sticks and patterns. E.g. Doji, engulfing pattern, hammer etc... Can be useful for small analysis patterns such as MA's or Stochastic indicators. 
+Link: https://github.com/TA-Lib/ta-lib-python
+
+Alpha Vantage API - Provides real-time and historical market data through a set of powerful and developer-friendly API's and spreadsheets. Operates similarly to MT5 API where live and historical data can be collected in JSON and CSV formats. Includes technical indicators such as SMA, EMA, RSI, etc... *Can possibly be useful for better analysis than TA-lib*
+
+JBlanked ForexFactory - Includes all necessary trading information regarding news. Will operate by extracting relevant headings and sorting them regarding severity. 
+
+		2. Project Developmental Plan
+		_____________________________
+
+	*NOTES*
+	_______
+
+- Possibly use a parent child process. Child process calls relevant functions in order to analyse the market. Following this parent process called to find relevant trade information(SL,TP,LIMIT(MAYB)). 
+
+
+	*PLAN*
+	______
+
+->	Is the session currently being traded correct? (LDN, NY, ASIA(MAYBE))
+
+->	Are we in a potential OB, FVG?
+
+->	Has liquidity been taken out?
+
+->	Any sign of reversal?
+
+->	What are the key areas for price to retrace to?
+
+->	Any reversal pressure?
+
+->	External factors(NEWS?)
+	
+
+
+
+
+
+
+
