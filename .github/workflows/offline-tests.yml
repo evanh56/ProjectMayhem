@@ -2,6 +2,14 @@ name: Project Mayhem Offline Tests
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - improvement/offline-foundation-v1
+    paths:
+      - 'ProjectMayhem/**'
+      - 'tests/**'
+      - 'requirements-ci.txt'
+      - '.github/workflows/offline-tests.yml'
 
 permissions:
   contents: read
