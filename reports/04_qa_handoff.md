@@ -1,5 +1,5 @@
-# QA handoff
+# QA / Trading Risk and Execution Handoff
 
-The QA handoff source returned nothing.
+## QA source status
 
-No QA test results, test counts, test names, pass/fail statuses, defect list or independent QA approval were supplied.
+The QA source returned nothing.

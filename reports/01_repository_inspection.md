@@ -1,110 +1,115 @@
 # Inspection record
 
-## Repository and branch observed
+## Repository and branch
 
-- Repository URL: `https://github.com/evanh56/ProjectMayhem`
-- Owner: `evanh56`
-- Repository: `ProjectMayhem`
-- Branch inspected: `main`
-- Main head SHA returned by GitHub: `91860a951ea08e205ebbfd8389becce8647ebb7e`
-- Main commit message: `Correct Login`
-- Main branch protection: disabled
+- **Repository URL:** `https://github.com/evanh56/ProjectMayhem`
+- **Owner:** `evanh56`
+- **Repository:** `ProjectMayhem`
+- **Branch inspected:** `main`
+- **Main branch head SHA returned by GitHub:** `8feb36db91d7144b4a190a302634ddd30c449c0b`
+- **Repository access:** readable through GitHub read actions.
+- **`main` branch protection:** returned as disabled/unprotected.
 
-## Access check
+## Access check — exact GitHub action results
 
 ### 1. Read `ProjectMayhem/main.py` on `main`
 
-GitHub action used: `github_get_raw_repository_content`
+**Action:** `github_get_repository_content`  
+**Parameters:** owner `evanh56`, repository `ProjectMayhem`, ref `main`, path `ProjectMayhem/main.py`
 
-Exact result: returned a text response with:
+**Result:** success. GitHub returned:
 
-- `mimetype`: `text/plain`
-- `name`: `main.py`
-- A signed temporary download location
+- path: `ProjectMayhem/main.py`
+- blob SHA: `3f9cec66a27161dd329cf9f18e665182b60bd18e`
+- size: `14684`
+- encoding: `base64`
+- readable file content
+- raw URL: `https://raw.githubusercontent.com/evanh56/ProjectMayhem/main/ProjectMayhem/main.py`
 
-The action did not return the source text inline, but it confirmed that `ProjectMayhem/main.py` was readable.
+The returned source contains MT5 login code, hard-coded account values, `symbol = 'GBPJPY'`, MT5 candle retrieval, CSV writers, scheduling, and entry-point calls.
 
 ### 2. Get branch `main`
 
-GitHub action used: `github_get_a_branch`
+**Action:** `github_get_a_branch`  
+**Parameters:** owner `evanh56`, repository `ProjectMayhem`, branch `main`
 
-Exact result: branch exists.
+**Result:** success.
 
-Returned head SHA:
-
-```text
-91860a951ea08e205ebbfd8389becce8647ebb7e
-```
+- Branch: `main`
+- Head commit SHA: `8feb36db91d7144b4a190a302634ddd30c449c0b`
+- Commit message: `Merge pull request #2 from evanh56/improvement/offline-foundation-v1`
+- Commit timestamp: `2026-10-21T23:38:31Z`
 
 ### 3. Get branch `fix/offline-testability-m15-append`
 
-GitHub action used: `github_get_a_branch`
+**Action:** `github_get_a_branch`  
+**Parameters:** owner `evanh56`, repository `ProjectMayhem`, branch `fix/offline-testability-m15-append`
 
-Exact result: branch exists.
+**Result:** success; branch exists.
 
-Returned head SHA:
-
-```text
-91860a951ea08e205ebbfd8389becce8647ebb7e
-```
-
-It currently points to the same commit as `main`.
+- Branch: `fix/offline-testability-m15-append`
+- Head commit SHA: `8c33a68fb5c46c510170050c5262c8ef74dfa020`
+- Commit message: `Add Project Mayhem audit handoffs and consolidated report`
+- Commit timestamp: `2026-10-21T00:00:00Z`
 
 ### 4. List workflow runs for `.github/workflows/offline-tests.yml` on `main`
 
-GitHub action used: `github_list_workflow_runs_for_a_workflow`
+**Action:** `github_list_workflow_runs_for_a_workflow`  
+**Parameters:** owner `evanh56`, repository `ProjectMayhem`, workflow `.github/workflows/offline-tests.yml`, branch `main`, pull-request runs excluded
 
-Exact result: one workflow run was returned.
+**Result:** success. GitHub returned one run.
 
-| Run ID | Status | Conclusion | Head SHA | Created |
-|---:|---|---|---|---|
-| `39128978458` | `completed` | `success` | `ad1e0ee0b4727cbd23e9cb5d97b6e6d0a28476a8` | `2026-10-18T12:50:34Z` |
+Most recent run:
 
-Additional returned facts:
+| Field | Returned value |
+|---|---|
+| Run ID | `39128978458` |
+| Status | `completed` |
+| Conclusion | `success` |
+| Head SHA | `ad1e0ee0b4727cbd23e9cb5d97b6e6d0a28476a8` |
+| Created | `2026-10-18T12:50:34Z` |
+| Started | `2026-10-18T12:50:34Z` |
+| Updated | `2026-10-18T12:50:58Z` |
+| Event | `workflow_dispatch` |
+| Head branch | `main` |
+| Workflow | `Project Mayhem Offline Tests` |
+| Run number | `1` |
 
-- Workflow: `Project Mayhem Offline Tests`
-- Event: `workflow_dispatch`
-- Head branch: `main`
-- Run number: `1`
-- Run started: `2026-10-18T12:50:34Z`
-- Updated: `2026-10-18T12:50:58Z`
+This is real GitHub Actions evidence and is separate from any owner-pasted log or document summary.
 
-This is real GitHub Actions evidence returned by the workflow-run API. It is separate from any owner-pasted log or documentation summary.
+### Artifacts for run `39128978458`
 
-### Artifacts for the latest completed run
+**Action:** `github_list_workflow_run_artifacts`
 
-GitHub action used: `github_list_workflow_run_artifacts`
+**Result:** success.
 
-Exact result:
-
-```json
-{"artifacts":[],"total_count":0}
+```text
+artifacts: []
+total_count: 0
 ```
 
 No artifacts were returned.
 
-### Logs for the latest completed run
+### Logs for run `39128978458`
 
-GitHub action used: `github_download_workflow_run_logs`
+**Action:** `github_download_workflow_run_logs`
 
-Exact result: a logs ZIP archive was returned:
+**Result:** success. GitHub returned a downloadable ZIP archive descriptor:
 
 - MIME type: `application/zip`
-- Name: `evanh56_ProjectMayhem_run_39128978458_logs.zip`
+- archive name: `evanh56_ProjectMayhem_run_39128978458_logs.zip`
+- a temporary download URL was returned
 
-Therefore, the run logs could be downloaded. The returned action did not expose the ZIP contents as readable text in this inspection.
+Therefore, the run logs could be downloaded. The log contents were not read in this inspection.
 
-## Tree and root folders
+## Full repository tree
 
-GitHub action used: `github_get_a_tree`, recursive tree on `main`.
+**Action:** `github_get_a_tree`  
+**Parameters:** owner `evanh56`, repository `ProjectMayhem`, tree ref `main`, recursive `true`
 
-Exact result: returned a non-truncated recursive tree for SHA:
+**Result:** success. The tree was not truncated.
 
-```text
-91860a951ea08e205ebbfd8389becce8647ebb7e
-```
-
-Observed root folders:
+Root folders returned:
 
 - `.github/`
 - `ProjectMayhem/`
@@ -114,27 +119,54 @@ Observed root folders:
 - `skills/`
 - `tests/`
 
-The tree also returned `requirements-ci.txt`.
+Root files returned:
 
-The repository contains `ProjectMayhem/` directly at the root. No `src/` directory was returned.
+- `requirements-ci.txt`
 
-## Workflow configuration
+The tree also returned `ProjectMayhem/__pycache__/`, which was skipped as cache content.
 
-Path:
+Notable files returned include:
 
-```text
-.github/workflows/offline-tests.yml
-```
+- `.github/workflows/offline-tests.yml`
+- `ProjectMayhem/main.py`
+- `ProjectMayhem/Execution.py`
+- `ProjectMayhem/FairValueGap.py`
+- `ProjectMayhem/OrderBlockAnalysis.py`
+- `ProjectMayhem/Liquidity.py`
+- `ProjectMayhem/Strategy.py`
+- seven CSV files under `ProjectMayhem/`
+- `tests/test_offline.py`
+- `docs/project_overview.md`
+- `docs/Strategy.txt`
+- `docs/data_dictionary.md`
+- `docs/decision_log.md`
+- `docs/experiment_log.md`
+- `docs/risk_policy.md`
+- `docs/strategy_specification.md`
 
-GitHub action used: `github_get_repository_content`
+The tree confirms that the application source is directly under `ProjectMayhem/`; no `src/` directory was returned.
 
-Exact returned file content, decoded from the returned Base64:
+## Workflow contents
+
+**File:** `.github/workflows/offline-tests.yml`  
+**GitHub result:** success; file exists and was readable.  
+**Blob SHA:** `d6f84f1c1b389febcfee3700921a09317c74a6a6`
+
+Decoded content:
 
 ```yaml
 name: Project Mayhem Offline Tests
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - improvement/offline-foundation-v1
+    paths:
+      - 'ProjectMayhem/**'
+      - 'tests/**'
+      - 'requirements-ci.txt'
+      - '.github/workflows/offline-tests.yml'
 
 permissions:
   contents: read
@@ -147,9 +179,10 @@ jobs:
   offline-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
@@ -181,7 +214,7 @@ jobs:
 
       - name: Upload test evidence
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: project-mayhem-offline-results-${{ github.run_id }}-${{ github.run_attempt }}
           path: reports/ci/
@@ -189,48 +222,45 @@ jobs:
           if-no-files-found: warn
 ```
 
-Observed configuration:
+### Workflow observations
 
-- Trigger: manual `workflow_dispatch` only.
-- Python version: `3.11`.
-- Runner: `ubuntu-latest`.
-- Timeout: 5 minutes.
-- Inputs: no `workflow_dispatch` inputs are defined.
-- Dependency installation: `requirements-ci.txt`.
-- Test command: `python -m unittest discover -s tests -p 'test_offline.py' -v`.
-- Artifacts: configured through `actions/upload-artifact@v7`.
-- Upload condition: `always()`.
-- Artifact retention: 1 day.
-- The workflow has read-only repository contents permission.
-- Checkout credentials persistence is disabled.
+- Triggers:
+  - manual `workflow_dispatch`
+  - `push` only on branch `improvement/offline-foundation-v1`
+  - path filters cover `ProjectMayhem/**`, `tests/**`, `requirements-ci.txt`, and the workflow itself
+- Python version: `3.11`
+- Runner: `ubuntu-latest`
+- Timeout: five minutes
+- Inputs: no `workflow_dispatch.inputs` block is present; the workflow accepts no declared inputs.
+- Permissions: `contents: read`
+- Dependencies are installed from `requirements-ci.txt`.
+- Tests run with Python’s built-in `unittest` discovery.
+- Test output is written to `reports/ci/test-results.txt`.
+- Installed dependencies and revision information are written to `reports/ci/`.
+- Artifacts are configured for upload with `if: always()`.
+- The retrieved real run nevertheless returned zero artifacts.
 
 ## `requirements-ci.txt`
 
-Path:
+**File:** `requirements-ci.txt`  
+**GitHub result:** success; file exists and was readable.  
+**Blob SHA:** `a1e6c0bf859df58865e66aba1d07de3aa4de4f72`
 
-```text
-requirements-ci.txt
-```
-
-GitHub action used: `github_get_repository_content`
-
-Exact file content:
+Exact content:
 
 ```text
 pandas==2.2.3
 ```
 
+No other project-owned dependency manifest was observed in the returned tree.
+
 ## `tests/test_offline.py`
 
-Path:
+**File:** `tests/test_offline.py`  
+**GitHub result:** success; file exists and was readable.  
+**Blob SHA:** `6549f1e74e98ac4615b7a3ac347f79342c041382`
 
-```text
-tests/test_offline.py
-```
-
-GitHub action used: `github_get_repository_content`
-
-The returned file imports:
+Imports returned:
 
 ```python
 import ast
@@ -242,740 +272,683 @@ import tempfile
 import unittest
 ```
 
-It dynamically loads:
+The test file does not import `ProjectMayhem.main`, `Execution`, `Strategy`, `Liquidity`, or `OrderBlockAnalysis`. It dynamically loads `ProjectMayhem/FairValueGap.py` with `importlib.util`.
+
+### Test classes and tests
+
+#### `SourceChecks`
+
+##### `test_python_source_has_valid_syntax`
+
+Evidence:
+
+- Finds Python files below `ProjectMayhem/`.
+- Excludes `.venv`, `venv`, `__pycache__`, `.git`, and `__MACOSX`.
+- Asserts that at least one Python source file exists.
+- Parses every discovered Python source file with `ast.parse`.
+- This is a syntax test, not an execution or import test.
+
+#### `FairValueGapChecks`
+
+`setUpClass`:
+
+- Locates exactly one `FairValueGap.py`.
+- Loads it dynamically.
+- Executes the module loader.
+
+`setUp`:
+
+- Creates a temporary directory.
+- Changes the current working directory to that directory.
+
+`tearDown`:
+
+- Restores the prior working directory.
+- Removes the temporary directory.
+
+##### `test_detects_bullish_gap`
+
+Creates three candles:
+
+```text
+[199.0, 199.2, 198.9, 199.1]
+[199.3, 199.9, 199.25, 199.8]
+[199.9, 200.0, 199.85, 199.95]
+```
+
+Calls the module’s `search_for_fvg()` through the test harness.
+
+Asserts:
+
+- exactly one output row
+- output position is `"Bullish"`
+- `Prev_candle` is approximately `199.2`
+- `Next_candle` is approximately `199.85`
+
+##### `test_detects_bearish_gap`
+
+Builds bearish-oriented candles from the bullish fixture and calls the same detector.
+
+Asserts:
+
+- exactly one output row
+- output position is `"Bearish"`
+- `Prev_candle` is approximately `200.8`
+- `Next_candle` is approximately `200.15`
+
+##### `test_rejects_overlapping_outer_candles`
+
+Modifies the third candle so its low overlaps the relevant gap.
+
+Asserts:
 
 ```python
+self.assertEqual(self.detect(candles), [])
+```
+
+##### `test_removes_gap_after_later_boundary_breach`
+
+Appends a later candle that breaches the gap boundary.
+
+Asserts:
+
+```python
+self.assertEqual(self.detect(candles), [])
+```
+
+### Functions used from `ProjectMayhem/`
+
+The test directly exercises the `search_for_fvg()` function in:
+
+```text
 ProjectMayhem/FairValueGap.py
 ```
 
-It does not import `main.py`, `Execution.py`, `OrderBlockAnalysis.py`, `Liquidity.py`, or `Strategy.py`.
+It does not directly call the other application modules.
 
-### Tests returned
+## Documentation access
 
-#### `SourceChecks.test_python_source_has_valid_syntax`
+### `docs/project_overview.md`
 
-Assertions and behavior:
+**GitHub result:** success; file exists and was readable.  
+**Blob SHA:** `aae09ba3282f59682b310f96123ad7b3206efbfe`
 
-- Collects Python files under `ProjectMayhem/`, excluding:
-  - `.venv`
-  - `venv`
-  - `__pycache__`
-  - `.git`
-  - `__MACOSX`
-- Asserts that at least one Python source file exists.
-- Parses every discovered Python file with `ast.parse`.
-- Uses `subTest` with the relative filename.
+The document states, among other points:
 
-#### `FairValueGapChecks.setUpClass`
+- updated 18 October 2026
+- version `0.1`
+- the project targets GBPJPY and USDJPY
+- intended sequence is hourly context with 15-minute confirmation
+- planned initial target is 2R
+- intended maximum risk is 2% per trade
+- the project is a Python/MT5 prototype, not a verified trading system
+- no broker session, live order, paper trade, or profitability test was performed during document preparation
+- existing source reflects implemented behavior, not necessarily intended or correct behavior
+- source is directly under `ProjectMayhem/` in the actual tree, despite legacy `src/ProjectMayhem/` references in the document
+- an isolated offline harness and dependency manifest are required before application execution
+- the document records findings F01–F10, including credential exposure, symbol/file mismatch, append concerns, possible `NameError`, confirmation indexing, scheduling, look-ahead effects, and missing execution/testing evidence
 
-Behavior:
+## Source files inspected
 
-- Finds exactly one `FairValueGap.py` under the source directory.
-- Raises `RuntimeError` if the count is not exactly one.
-- Loads that file dynamically as module `fvg_under_test`.
+All requested source files were readable through GitHub actions.
 
-#### `FairValueGapChecks.setUp`
+### `ProjectMayhem/main.py`
 
-Behavior:
-
-- Saves the original working directory.
-- Creates a temporary directory.
-- Changes into that temporary directory.
-
-#### `FairValueGapChecks.tearDown`
-
-Behavior:
-
-- Restores the original working directory.
-- Removes the temporary directory.
-
-#### `FairValueGapChecks.detect`
-
-Behavior:
-
-- Writes a temporary `GBPUSD_15m_Data.csv`.
-- Header:
-
-```text
-Date,Open,High,Low,Close
-```
-
-- Writes supplied candles with timestamps beginning at `2025-01-01 00:00:00`, incrementing by 15 minutes.
-- Writes a temporary `FairValueGap_15m.csv`.
-- Header:
-
-```text
-Date,Prev_candle,Next_candle,Position
-```
-
-- Calls:
+Observed imports:
 
 ```python
-self.fvg.search_for_fvg()
+import csv
+import MetaTrader5 as mt
+from datetime import datetime, timezone
+import pandas as pd
+import pytz
+import time
+import tzlocal
+import threading
+
+import Execution as ex
+import FairValueGap as fvg
+import OrderBlockAnalysis as ob
+import Liquidity as lqt
+import Strategy as s
 ```
 
-- Reads and returns the generated CSV rows.
+Observed module-level broker credentials and connection:
 
-#### `FairValueGapChecks.bullish_candles`
+- module-level `login`
+- module-level `password`
+- module-level `server`
+- module-level call to `mt.login(login, password, server)`
 
-Returns three candle rows:
-
-```python
-[
-    [199.0, 199.2, 198.9, 199.1],
-    [199.3, 199.9, 199.25, 199.8],
-    [199.9, 200.0, 199.85, 199.95],
-]
-```
-
-#### `FairValueGapChecks.test_detects_bullish_gap`
-
-Assertions:
-
-- Exactly one output row.
-- `Position == "Bullish"`.
-- `Prev_candle` approximately equals `199.2`.
-- `Next_candle` approximately equals `199.85`.
-
-#### `FairValueGapChecks.test_detects_bearish_gap`
-
-Constructs a bearish candle sequence by transforming the bullish candles:
-
-```python
-[
-    [400 - o, 400 - low, 400 - high, 400 - close]
-    for o, high, low, close in self.bullish_candles()
-]
-```
-
-Assertions:
-
-- Exactly one output row.
-- `Position == "Bearish"`.
-- `Prev_candle` approximately equals `200.8`.
-- `Next_candle` approximately equals `200.15`.
-
-#### `FairValueGapChecks.test_rejects_overlapping_outer_candles`
-
-Behavior:
-
-- Changes the third candle’s low to `199.1`.
-- Asserts the detector returns an empty list.
-
-#### `FairValueGapChecks.test_removes_gap_after_later_boundary_breach`
-
-Behavior:
-
-- Appends:
-
-```python
-[199.9, 200.0, 199.1, 199.3]
-```
-
-- Asserts the detector returns an empty list.
-
-The file ends with:
-
-```python
-if __name__ == "__main__":
-    unittest.main()
-```
-
-## Files inspected
-
-The following GitHub raw-content actions all returned signed text download responses:
-
-- `ProjectMayhem/main.py`
-- `ProjectMayhem/Execution.py`
-- `ProjectMayhem/FairValueGap.py`
-- `ProjectMayhem/OrderBlockAnalysis.py`
-- `ProjectMayhem/Liquidity.py`
-- `ProjectMayhem/Strategy.py`
-
-The raw-content action returned metadata and signed download locations rather than inline source text in this session. Consequently, I cannot truthfully reproduce the source bodies or count source line numbers from those responses.
-
-The tree confirms these source paths and sizes:
-
-| Path | Size returned |
-|---|---:|
-| `ProjectMayhem/main.py` | 14,684 bytes |
-| `ProjectMayhem/Execution.py` | 905 bytes |
-| `ProjectMayhem/FairValueGap.py` | 2,551 bytes |
-| `ProjectMayhem/OrderBlockAnalysis.py` | 7,206 bytes |
-| `ProjectMayhem/Liquidity.py` | 3,223 bytes |
-| `ProjectMayhem/Strategy.py` | 4,734 bytes |
-
-The tree also returned compiled cache files under:
-
-```text
-ProjectMayhem/__pycache__/
-```
-
-These were skipped as requested.
-
-## CSV files observed
-
-The tree returned these CSV files under `ProjectMayhem/`:
-
-```text
-ProjectMayhem/Current_Candle_1m_Data.csv
-ProjectMayhem/FairValueGap_15m.csv
-ProjectMayhem/GBPUSD_15m_Data.csv
-ProjectMayhem/GBPUSD_1hr_Data.csv
-ProjectMayhem/Liquidity_15m.csv
-ProjectMayhem/OrderBlock_15m.csv
-ProjectMayhem/OrderBlock_1hr.csv
-```
-
-The filenames show the documented mismatch: the available market-data snapshots are named `GBPUSD`, while the supplied project documentation reports code selecting `GBPJPY`; no independently named `USDJPY` CSV was returned.
-
-## Documentation evidence
-
-Path:
-
-```text
-docs/project_overview.md
-```
-
-GitHub action used: `github_get_repository_content`
-
-The returned document states, among other points:
-
-- Updated 18 October 2026.
-- Version `0.1`.
-- The project targets GBPJPY and USDJPY.
-- It uses hourly areas of interest and 15-minute confirmation.
-- It is a Python/MT5 prototype, not a verified trading system.
-- No broker session, live order, paper trade, or profitability test was performed while preparing the documents.
-- Existing source code describes implemented behavior, not necessarily intended or correct behavior.
-- The historical entry point is documented as `src/ProjectMayhem/main.py`, but the actual tree shows the source directly at `ProjectMayhem/main.py`.
-- The document itself records that six Python modules and seven CSV snapshots were inspected.
-- It records limitations involving hard-coded GBPJPY, GBPUSD filenames, incomplete strategy state handling, execution stubs, and commented-out scheduling.
-- It identifies credential exposure in `main.py`.
-- It states that `Execution.py::taketrade()` prints `"Work in progress"` and that `main()` returns without placing an order.
-- It calls for an isolated offline harness, removal of broker side effects from imports in a reviewed change, and a dependency manifest before code execution.
-
-The documentation’s `src/ProjectMayhem/` references are legacy documentation paths. The actual GitHub tree confirms `ProjectMayhem/` at the repository root.
-
-## Credential locations
-
-The documentation identifies credential-related code in:
+Credential values are not reproduced here. Their location is:
 
 ```text
 ProjectMayhem/main.py
 ```
 
-Specifically, it describes module-level authentication assignments and an `mt.login` call.
+Observed instrument:
 
-Credential values were not reproduced.
+```python
+symbol = 'GBPJPY'
+```
+
+Observed MT5 timeframes and candle counts:
+
+- M1: one candle
+- M15: 192 candles
+- H1: 120 candles
+
+Observed MT5 calls include:
+
+- `mt.initialize()`
+- `mt.account_info()`
+- `mt.copy_rates_from_pos(...)`
+- `mt.symbol_select(...)`
+- `mt.symbol_info_tick(...)`
+- `mt.shutdown()`
+- `mt.login(...)`
+
+Observed candle handling:
+
+- MT5 timestamps are converted with `pd.to_datetime(..., unit='s', utc=True)`.
+- They are converted to `Europe/London` with `pytz`.
+- Timezone information is then stripped with `.dt.tz_localize(None)`.
+- Retrieval starts at position `0`, so the current/latest candle may be included.
+- No explicit completed-candle filtering was observed.
+
+Observed entry points/functions:
+
+- `MT5_account()`
+- `check_system_timezone()`
+- `get_candle_1m(...)`
+- `get_candles_15m(...)`
+- `get_candles_1hr(...)`
+- `data_1m()`
+- `write_1m(...)`
+- `data_15m()`
+- `write_15m(...)`
+- `FairValueGap()`
+- `OrderBlock_15m()`
+- `Liquidity()`
+- `data_1Hr()`
+- `write_1hr(...)`
+- `OrderBlock_1hr()`
+- `initialise(...)`
+- `check_1m()`
+- `check_15m()`
+- `check_1hr()`
+- `should_run_now(...)`
+- `run_scheduler()`
+- `main()`
+
+The `main()` function:
+
+- calls `MT5_account()`
+- runs initial M1, M15, and H1 checks
+- starts the scheduler
+- eventually calls `mt.shutdown()`
+- calls `check_1m()` and `s.main()` after the scheduler block
+
+The file ends with:
+
+```python
+if __name__ == '__main__':
+    main()
+```
+
+The module-level `mt.login(...)` occurs before that guard, so importing the module has broker-side effects.
+
+### `ProjectMayhem/FairValueGap.py`
+
+Functions:
+
+- `add_fvg(FairValueGap)`
+- `check_fvg(FairValueGap, pos, loc)`
+- `search_for_fvg()`
+- `main()`
+
+Observed detection formulas:
+
+Bullish candidate:
+
+```python
+current['Open'] - current['Close'] < 0
+prev['High'] < current['Close']
+next['Low'] > current['Open']
+next['High'] - prev['Low'] > 0.00005
+```
+
+The output stores:
+
+- `Date`: current candle date
+- `Prev_candle`: previous candle high
+- `Next_candle`: next candle low
+- `Position`: `"Bullish"`
+
+Bearish candidate:
+
+```python
+current['Open'] - current['Close'] > 0
+prev['Low'] > current['Close']
+next['High'] < current['Open']
+prev['Low'] - next['High'] > 0.00005
+```
+
+The output stores:
+
+- `Date`: current candle date
+- `Prev_candle`: previous candle low
+- `Next_candle`: next candle high
+- `Position`: `"Bearish"`
+
+The later invalidation scan checks later rows and rejects a candidate if:
+
+- bullish: later `Close < Next_candle` or later `Low < Next_candle`
+- bearish: later `Close > Next_candle` or later `High > Next_candle`
+
+It reads:
+
+```text
+GBPUSD_15m_Data.csv
+```
+
+and writes:
+
+```text
+FairValueGap_15m.csv
+```
+
+### `ProjectMayhem/OrderBlockAnalysis.py`
+
+Functions:
+
+- `countRows(counter, data_file)`
+- `AddOb(ob_dict, val)`
+- `check_prev(prev_row, loc)`
+- `Next_candle(next1, next2, loc)`
+- `OB_check(OrderBlock, counter, pos, loc, data_file)`
+- `Analyse_Data(data_file, val)`
+- `main(data_file, val)`
+
+Observed order-block direction formula:
+
+```python
+Open - Close > 0
+```
+
+is treated as bearish; otherwise bullish.
+
+Observed containment bounds:
+
+```python
+ob_open = float(OrderBlock['Open'])
+ob_close = float(OrderBlock['Close'])
+lo_body = min(ob_open, ob_close)
+hi_body = max(ob_open, ob_close)
+end_contain = min(pos + 6, counter - 1, len_df - 1)
+```
+
+The code scans subsequent candles for containment inside the order-block body.
+
+Observed activation/invalidation:
+
+- Bearish OB:
+  - activation when a later high or open exceeds the OB open
+  - invalidation when a later low, open, or close falls below the OB open
+- Bullish OB:
+  - activation when a later low, open, or close falls below the OB open
+  - invalidation when a later high, open, or close rises above the OB open
+
+The module writes:
+
+- `OrderBlock_15m.csv` when `val == 0`
+- `OrderBlock_1hr.csv` otherwise
+
+It uses later candles and a global counter. The documentation identifies possible look-ahead and indexing concerns.
+
+### `ProjectMayhem/Liquidity.py`
+
+Functions:
+
+- `Add_liq(Liquidity)`
+- `check_liq(Liquidity, pos, loc, HrL)`
+- `find_liq()`
+- `main()`
+
+Observed liquidity candidate thresholds:
+
+For bearish candles:
+
+```python
+current['Close'] - current['Low'] > 0.06
+```
+
+with liquidity level based on `current['Low']`.
+
+For bullish candles:
+
+```python
+current['High'] - current['Close'] > 0.06
+```
+
+with liquidity level based on `current['High']`.
+
+A second set of smaller thresholds appears for bullish/bearish candle wick logic:
+
+```python
+current['High'] - current['Close'] > 0.00018
+current['Close'] - current['Low'] > 0.00018
+```
+
+The code uses `HrL` values `"High"` and `"Low"` and checks later candles against the stored liquidity level.
+
+It reads:
+
+```text
+GBPUSD_15m_Data.csv
+```
+
+and writes:
+
+```text
+Liquidity_15m.csv
+```
+
+### `ProjectMayhem/Strategy.py`
+
+Functions:
+
+- `check_trading_time(start_time_str, end_time_str)`
+- `check_if_in_ob_hr(minute_candle, val)`
+- `correct_dir()`
+- `check_if_in_fvg()`
+- `run_strategy_check()`
+- `main()`
+
+Observed session check:
+
+```python
+check_trading_time('07:00', '02:00')
+```
+
+The function handles a time window crossing midnight by accepting times after the start or before the end.
+
+Observed order-block file choice:
+
+```python
+'OrderBlock_1hr.csv' if val == 1 else 'OrderBlock_15m.csv'
+```
+
+Observed order-block zone bounds:
+
+- bullish:
+  - top = `Close`
+  - bottom = `Open`
+- bearish:
+  - top = `Open`
+  - bottom = `Close`
+
+Observed overlap check:
+
+```python
+body_fully_inside = (body_bottom >= ob_zone_bottom) and (body_top <= ob_zone_top)
+body_overlaps_zone = not (body_top < ob_zone_bottom or body_bottom > ob_zone_top)
+```
+
+Observed direction confirmation:
+
+- bullish OB requires a later close below the OB open
+- bearish OB requires a later close above the OB open
+
+Observed FVG confirmation:
+
+- bullish position checks current close and low against `Next_candle`
+- bearish position checks current open and high against `Next_candle`
+
+The module uses global state:
+
+- `hourly_ob`
+- `ob_15m`
+- `pos`
+- `ob_15`
+
+The documentation identifies incomplete state handling and possible indexing problems.
+
+### `ProjectMayhem/Execution.py`
+
+Functions:
+
+- `price_to_pip(symbol, live_price)`
+- `taketrade()`
+- `main(candle_of_joy)`
+
+Observed experimental position-sizing formula for JPY and GBPUSD symbols:
+
+```python
+acc_bal = mt.account_info().balance
+pip_val = acc_bal / 100
+pips = 7
+pip_unit = pip_val / live_price
+lot_size = round(pip_unit * pips, 2)
+```
+
+A module-level ticker is set to:
+
+```python
+ticker = 'GBPJPY'
+```
+
+Observed stop-loss variable:
+
+```python
+Sl = 350
+```
+
+Observed execution behavior:
+
+```python
+def taketrade():
+    print("Work in progress")
+    return
+```
+
+No MT5 order-placement call was returned in this file. No `order_send` call was observed. `main(candle_of_joy)` returns immediately.
+
+Therefore:
+
+- position sizing is experimental and not compliant with the documented 2%-risk policy
+- stop/take-profit behavior is not implemented
+- order placement is not implemented
+- broker execution remains a stub
+
+## Instrument selection and CSV files
+
+The tree returned these CSV files:
+
+```text
+ProjectMayhem/Current_Candle_1m_Data.csv
+ProjectMayhem/GBPUSD_15m_Data.csv
+ProjectMayhem/GBPUSD_1hr_Data.csv
+ProjectMayhem/FairValueGap_15m.csv
+ProjectMayhem/OrderBlock_15m.csv
+ProjectMayhem/OrderBlock_1hr.csv
+ProjectMayhem/Liquidity_15m.csv
+```
+
+Observed mismatch:
+
+- `main.py` selects `GBPJPY`
+- data files are named `GBPUSD_15m_Data.csv` and `GBPUSD_1hr_Data.csv`
+- no independent USDJPY stream was returned
+- CSV files do not contain a symbol column according to the inspected documentation and source behavior
+
+## MT5 and broker calls
+
+Observed in `ProjectMayhem/main.py`:
+
+- `mt.login(...)`
+- `mt.initialize()`
+- `mt.account_info()`
+- `mt.copy_rates_from_pos(...)`
+- `mt.symbol_select(...)`
+- `mt.symbol_info_tick(...)`
+- `mt.shutdown()`
+
+Observed in `ProjectMayhem/Execution.py`:
+
+- `mt.account_info()`
+
+No returned source contained a working MT5 order-placement call.
+
+## Timestamp and candle handling
+
+Observed:
+
+- MT5 epoch timestamps are parsed as UTC.
+- Times are converted to `Europe/London`.
+- Timezone metadata is removed before CSV output.
+- Current-position retrieval starts at position zero.
+- The code does not establish that the latest candle is closed before writing or analysis.
+- Stored CSV timestamps therefore lack offset/completion metadata.
+- The documented risk/data requirements call for preserving legacy timestamps until provenance is reconciled and for event-time-safe H1/M15 joins.
+
+## Dependency and package observations
+
+Observed project-owned manifest:
+
+```text
+requirements-ci.txt
+```
+
+Exact content:
+
+```text
+pandas==2.2.3
+```
+
+Direct runtime imports in the source include:
+
+- `MetaTrader5`
+- `pandas`
+- `pytz`
+- `tzlocal`
+
+Only `pandas` is listed in the CI manifest. The workflow does not install the runtime MT5 dependency.
+
+The repository documentation explicitly states that the bundled virtual environment should not be blindly copied or treated as a reproducible dependency manifest.
+
+## Credential locations
+
+Credential material was returned in:
+
+```text
+ProjectMayhem/main.py
+```
+
+The file contains module-level login, password, and server assignments and calls `mt.login(...)`.
+
+Credential values are intentionally not reproduced.
 
 Required remediation:
 
-- Remove embedded credential values from source.
-- Rotate any credentials that may have been committed.
-- Use a secret-management mechanism for any future broker-connected environment.
-- Keep offline tests secret-free.
-- Avoid broker login as an import-time side effect.
-
-## Workflow run evidence
-
-The only run returned by the workflow-run listing was:
-
-```text
-Run ID: 39128978458
-Status: completed
-Conclusion: success
-Head SHA: ad1e0ee0b4727cbd23e9cb5d97b6e6d0a28476a8
-Created: 2026-10-18T12:50:34Z
-Event: workflow_dispatch
-Branch: main
-```
-
-Artifacts:
-
-```text
-No artifacts returned; total_count: 0
-```
-
-Logs:
-
-```text
-Download succeeded; ZIP archive returned:
-evạnh56_ProjectMayhem_run_39128978458_logs.zip
-```
-
-This run evidence is not merged with the owner-provided documentation or any pasted log. The run head SHA differs from the current `main` head SHA observed above, which is expected because the current branch has since advanced.
-
-## Execution and capability status
-
-I did not execute repository code, install dependencies, authenticate with MT5, connect to a broker, retrieve market data, place orders, run local tests, or perform a backtest.
-
-The workflow was not executed by me.
-
-I have no action available to dispatch or re-run workflows. The workflow-run listing returned an existing manually dispatched run, but I did not dispatch or re-run it.
-
-No repository writes were performed. I did not:
-
-- create files
-- update files
-- delete files
-- commit
-- push
-- open a pull request
-- dispatch a workflow
-- re-run a workflow
-
-Unavailable or not verified in this inspection:
-
-- Inline source text for the six raw-content responses was not returned by the tool.
-- Source line numbers for those six modules are therefore not observable from the returned data.
-- Workflow log contents were not exposed; only a downloadable ZIP was returned.
-- No artifact contents were returned.
-- No local execution capability was used or verified.
-- No broker or MT5 session was available or used.
-- No live, paper, or simulated trading result was produced.
-- No performance baseline, P&L, win rate, drawdown, or profit factor was established.
-- No workflow dispatch or re-run capability is available.
-- No file-writing or repository-modification capability is available. ; reports/02_researcher_handoff.md = # Offline testing and numerical validation handoff
-
-## Repository / revision observed
-
-- **Repository:** `evanh56/ProjectMayhem`
-- **Branch:** `main`
-- **Observed commit:** `91860a951ea08e205ebbfd8389becce8647ebb7e` (`Correct Login`)
-- **Actual source path:** `ProjectMayhem/`; documentation references to `src/ProjectMayhem/` are legacy paths.
-- **Related branch:** `fix/offline-testability-m15-append` points to the same observed commit.
-- **Existing CI evidence:** workflow run `39128978458` completed successfully, but it ran at head SHA `ad1e0ee0b4727cbd23e9cb5d97b6e6d0a28476a8`, not the current observed `main` commit. No artifacts were returned and log contents were not exposed.
-
----
-
-## 1. Intended strategy versus implementation and offline test expectations
-
-### Confirmed intended requirements
-
-| Item | Requirement | Status / source |
-|---|---|---|
-| Instruments | GBPJPY and USDJPY | **Owner requirement**, `project_overview`, `decision_log` D001 |
-| Higher-timeframe context | H1 areas of interest | **Owner requirement**, `project_overview`, D001 |
-| Confirmation timeframe | M15 | **Owner requirement**, `project_overview`, D001 |
-| Initial target | Exactly 2R | **Owner requirement**, `project_overview`, `risk_policy`, D002 |
-| Intended maximum risk | 2% per trade | **Owner requirement**, `project_overview`, `risk_policy`, D002 |
-| Trading objective | Short-duration trading | **Owner requirement**, `project_overview` |
-| Frequency | 2–3 trades/day | **Owner requirement / intent**, `decision_log` D003; not a performance acceptance criterion |
-| No forced trades | Do not trade without a valid setup | **Proposal**, D009 |
-| Execution | No production order placement is currently available | **Observed fact**, `project_overview`; `Execution.py::taketrade()` is documented as printing `"Work in progress"` |
-
-### Repository and test behavior actually evidenced
-
-`tests/test_offline.py`:
-
-1. Parses all Python files under `ProjectMayhem/`.
-2. Dynamically loads only `ProjectMayhem/FairValueGap.py`.
-3. Creates temporary files named:
-   - `GBPUSD_15m_Data.csv`
-   - `FairValueGap_15m.csv`
-4. Supplies candles with timestamps beginning at `2025-01-01 00:00:00`, at 15-minute intervals.
-5. Tests bullish and bearish FVG detection.
-6. Tests rejection when the outer candles overlap.
-7. Tests removal of a detected gap after a later boundary breach.
+- revoke/rotate any exposed broker credentials
+- remove credential literals from source history and working tree
+- use environment variables or a secret manager
+- prevent broker authentication during imports
+- ensure offline tests cannot access broker credentials or MT5
 
-### Reconciliation
+The historical `docs/Strategy.txt` also contains authentication examples/placeholders. No values are reproduced.
 
-The offline tests are a **narrow detector contract**, not a complete implementation of the intended GBPJPY/USDJPY H1–M15 strategy.
+## Real workflow evidence versus supplied documentation
 
-Material mismatches:
+### Real GitHub Actions evidence
 
-- The test fixture uses **GBPUSD**, while the project requirement is **GBPJPY and USDJPY**. This is consistent with the documented filename/data mismatch but does not validate either required instrument.
-- The test exercises only `FairValueGap.py`; it does not validate:
-  - H1 area selection;
-  - M15 confirmation;
-  - direction alignment;
-  - order blocks;
-  - liquidity-based stops;
-  - entry timing;
-  - risk sizing;
-  - 2R take-profit;
-  - sessions;
-  - holding period;
-  - transaction costs;
-  - portfolio exposure.
-- A passing CI run therefore establishes, at most, syntax validity and the tested FVG fixture behavior. It does **not** establish runtime readiness or a trading edge. This follows `experiment_log`, EXP-000, and `risk_policy`.
+Retrieved directly from GitHub:
 
-**Assumption A1 — explicit:** The assertions in `tests/test_offline.py` are treated as current implementation/test expectations, not as owner-approved definitions of the trading strategy.
+- Run ID: `39128978458`
+- Branch: `main`
+- Head SHA: `ad1e0ee0b4727cbd23e9cb5d97b6e6d0a28476a8`
+- Status: `completed`
+- Conclusion: `success`
+- Created: `2026-10-18T12:50:34Z`
+- Artifacts: none returned
+- Logs: downloadable ZIP returned
 
----
+### Not merged with that evidence
 
-## 2. Approved calculations versus unresolved definitions
+The supplied document digest says that an offline baseline inspection was completed and describes static findings. That owner-provided/documentary material is not treated as the workflow log and was not merged with the real run evidence above.
 
-### Approved or sufficiently specified
+The retrieved workflow run is not proof that the current `main` commit was tested: its head SHA differs from the current `main` head SHA.
 
-| Calculation / rule | Current definition | Status |
-|---|---|---|
-| Initial risk fraction | `0.02 × current account equity` as the intended maximum risk budget | **Approved owner requirement**, `risk_policy` |
-| Initial target | `TP distance = 2 × initial stop distance` for a 2R target | **Approved owner requirement**, D002 |
-| Position sizing inputs | Equity, approved risk fraction, side, symbol, volume rules, entry assumptions, execution costs, price precision, margin and currency conversion | **Approved control requirements**, `risk_policy` |
-| Volume rounding | Round volume down; reject if minimum volume exceeds the risk budget | **Approved owner requirement**, `risk_policy` |
-| H1/M15 temporal join | Use only information available at the event time | **Approved owner requirement**, `data_dictionary` |
-| FVG bullish test result | For the supplied test fixture, output one bullish row with bounds represented by `Prev_candle ≈ 199.2` and `Next_candle ≈ 199.85` | **Test expectation only**, `tests/test_offline.py` |
-| FVG bearish test result | For the transformed fixture, output one bearish row with bounds represented by `Prev_candle ≈ 200.8` and `Next_candle ≈ 200.15` | **Test expectation only**, `tests/test_offline.py` |
-| FVG invalidation test | A later candle boundary breach removes the earlier detected gap | **Test expectation only**, `tests/test_offline.py` |
+## Findings
 
-### Unresolved strategy definitions
+1. **Broker side effect on import**  
+   `ProjectMayhem/main.py` performs `mt.login(...)` at module scope.
 
-The following are not numerically defined by the supplied digest or inspection record:
+2. **Credential exposure**  
+   Broker credential assignments are present in `ProjectMayhem/main.py`. Values are withheld here. Rotate and remove them.
 
-| Q reference | Unresolved item | Required decision |
-|---|---|---|
-| Q01–Q04 | Zone definitions, direction labels, confirmation timing | Define exact H1 area, OB/FVG boundaries, bullish/bearish labels, and when an M15 confirmation becomes actionable |
-| Q05 | Entry rule | Market, limit, or stop entry; exact trigger candle; entry price basis; whether entry occurs intrabar or only after M15 close |
-| Q06 | Liquidity stop | Define the liquidity event, stop anchor, buffer, spread treatment, and whether the stop is beyond a wick, swing, or zone |
-| Q07 | Sessions | Select LDN, NY, Asia, or a precise timezone/session window |
-| Q08 | Maximum holding period | Set a numeric limit; “not multiple hours” is not executable |
-| Q09 | Portfolio limits | Aggregate open risk, concurrent positions, directional JPY exposure, daily loss and drawdown limits |
-| Q10 | Frequency semantics | Define whether 2–3 trades/day is a target, cap, per-symbol limit, or portfolio limit; define cooldown and duplicate-signal behavior |
-| Q11 | Evaluation evidence and promotion | Define minimum sample size, chronological development/validation/holdout windows, cost assumptions, and promotion criteria |
+3. **Instrument/file mismatch**  
+   Runtime symbol is `GBPJPY`, while data filenames are `GBPUSD_*`.
 
-Additional unresolved calculations:
+4. **No independent USDJPY stream**  
+   No USDJPY CSV or symbol-specific stream was returned.
 
-- News and external-factor treatment: `Strategy.txt`, pending decisions.
-- Spread, slippage, commission and data-freshness limits: `risk_policy`, `data_dictionary`.
-- Order-block direction and boundary semantics.
-- Liquidity output interpretation, because the digest states that some side/context information is lost.
-- Timezone and candle-completion semantics, because CSV timestamps have no offset or completion metadata.
+5. **Incomplete dependency declaration**  
+   `requirements-ci.txt` contains only `pandas==2.2.3`; runtime source imports additional external packages.
 
-**Assumption A2 — explicit:** Undefined controls must be treated as missing configuration and cause a fail-closed result, not as zero, unlimited, or an implicit default. Source: `decision_log`, `risk_policy`.
+6. **Execution is not implemented**  
+   `Execution.py::taketrade()` only prints `"Work in progress"` and returns.
 
----
+7. **No order-placement evidence**  
+   No working MT5 `order_send` path was observed.
 
-## 3. Review of FVG boundaries, order-block direction, liquidity levels and timestamps
+8. **Position sizing is not the documented policy**  
+   `price_to_pip()` uses balance-derived experimental arithmetic and does not implement current-equity, stop-loss-loss, contract, currency, cost, and broker-constraint checks.
 
-### Fair-value-gap boundaries
+9. **Stop/take-profit behavior is absent**  
+   No complete stop-loss/take-profit order construction was returned.
 
-The tested bullish fixture is:
+10. **Potential forming-candle use**  
+    MT5 retrieval begins at position zero and no closed-candle exclusion was observed.
 
-| Candle | Open | High | Low | Close |
-|---|---:|---:|---:|---:|
-| 1 | 199.0 | 199.2 | 198.9 | 199.1 |
-| 2 | 199.3 | 199.9 | 199.25 | 199.8 |
-| 3 | 199.9 | 200.0 | 199.85 | 199.95 |
+11. **Timezone provenance loss**  
+    Source converts timestamps to London time and strips timezone information before CSV output.
 
-The test expects:
+12. **FVG detector uses fixed thresholds**  
+    FVG detection uses `0.00005` thresholds and later-row invalidation scans.
 
-- `Position = "Bullish"`
-- `Prev_candle ≈ 199.2`
-- `Next_candle ≈ 199.85`
+13. **Liquidity detector uses fixed thresholds**  
+    Liquidity logic uses `0.06` and `0.00018` thresholds.
 
-This is consistent with an inferred bullish outer-candle gap:
+14. **Order-block logic is stateful and look-ahead-sensitive**  
+    It scans later candles for activation/invalidation and writes derived snapshots.
 
-\[
-\text{bullish gap bounds} = [\text{candle 1 high},\ \text{candle 3 low}]
-= [199.20,\ 199.85]
-\]
+15. **Strategy state is incomplete**  
+    `Strategy.py` relies on global state and does not implement a complete order lifecycle.
 
-For the transformed bearish fixture, the expected values are:
+16. **Offline tests are narrow**  
+    Tests cover syntax and FVG behavior only. They do not test MT5 isolation, order placement, sizing, Strategy, Liquidity, or OrderBlockAnalysis.
 
-\[
-[200.15,\ 200.80]
-\]
+17. **Current run evidence is historical relative to `main`**  
+    The only retrieved run passed at head SHA `ad1e0ee0...`; current `main` is `8feb36db...`.
 
-However:
+18. **No artifacts were returned for the successful run**  
+    Although artifact upload is configured, GitHub returned `total_count: 0`.
 
-- The field names `Prev_candle` and `Next_candle` do not clearly state lower and upper bounds.
-- The digest proposes normalising FVG display bounds using `min/max` while retaining original fields.
-- The implementation’s output is a regenerated snapshot with later-row invalidation scans, not an immutable event history.
+## Capabilities unavailable or not performed
 
-**Conclusion:** The numeric test behavior is reproducible from the test file, but the approved strategy meaning of the boundaries remains unresolved under **Q01–Q04**.
-
-### FVG invalidation
-
-`test_removes_gap_after_later_boundary_breach` appends:
-
-```text
-Open 199.9, High 200.0, Low 199.1, Close 199.3
-```
-
-and expects no retained FVG.
-
-This establishes a test expectation that a later candle breaching the gap boundary invalidates the output. It does not establish:
-
-- whether any wick breach or only a close invalidates;
-- whether invalidation occurs at candle close or intrabar;
-- whether a retest consumes the zone;
-- whether an invalidated event should remain in an immutable history.
-
-These are part of **Q01–Q04** and the data-model concerns in `data_dictionary`.
-
-### Order-block direction
-
-The supplied material does not provide a sufficiently precise formula for:
-
-- selecting the order-block candle;
-- defining bullish versus bearish order blocks;
-- using candle body, wick, or full range;
-- determining whether the block is H1-only or can be M15;
-- invalidating the block;
-- resolving conflicts between an OB and an FVG.
-
-The digest specifically records OB bounds and labels as requiring reconciliation. This remains unresolved under **Q01–Q04**.
-
-**Assumption A3 — explicit:** No order-block formula should be inferred from filenames, labels, or historical trading terminology.
-
-### Liquidity levels and stops
-
-The supplied material does not define:
-
-- equal-high/equal-low tolerance;
-- swing lookback;
-- buy-side versus sell-side liquidity;
-- whether a liquidity sweep requires a wick and close back inside;
-- which liquidity level anchors the stop;
-- stop buffer size;
-- treatment of spread and slippage.
-
-The digest states that liquidity output loses some side/context information. Therefore the existing CSV cannot, by itself, be assumed to contain enough information for a directionally correct stop.
-
-This remains unresolved under **Q05–Q06**, with cost and exposure controls additionally covered by `risk_policy`.
-
-### Confirmation timestamps
-
-The test creates 15-minute timestamps, but makes no timestamp assertions. The supplied CSV metadata lacks:
-
-- timezone offset;
-- broker/server timezone;
-- candle-completion flag;
-- extraction timestamp;
-- symbol and broker identity;
-- spread and price basis.
-
-The intended join must therefore be:
-
-1. Identify the completed H1 candle and H1 zone using data available at that time.
-2. Process only completed M15 candles after the zone is known.
-3. Timestamp the confirmation at the M15 candle close unless the owner approves an intrabar rule.
-4. Permit entry only using a quote available after that confirmation timestamp.
-
-This is a **proposed interpretation**, not an approved entry rule, and is unresolved under **Q04–Q05**.
-
-**Assumption A4 — explicit:** No current-bar high, low, close, zone invalidation, or confirmation result may be used before that candle is complete.
-
----
-
-## 4. Proposed worked acceptance examples
-
-These examples are proposed acceptance tests, not evidence of strategy approval or profitability.
-
-### Example 1 — bullish FVG detector
-
-**Inputs**
-
-- Instrument label: `GBPUSD` fixture only; this does not validate GBPJPY.
-- Timeframe: M15.
-- Three sequential candles, prices in quote-price units:
-
-```text
-C1: O=199.0, H=199.2,  L=198.9,  C=199.1
-C2: O=199.3, H=199.9,  L=199.25, C=199.8
-C3: O=199.9, H=200.0,  L=199.85, C=199.95
-```
-
-**Expected output**
-
-```text
-row_count = 1
-Position = "Bullish"
-lower_bound = 199.20
-upper_bound = 199.85
-```
-
-The test file expresses these bounds as:
-
-```text
-Prev_candle ≈ 199.2
-Next_candle ≈ 199.85
-```
-
-**Acceptance tolerance:** the existing test uses approximate numeric comparison; the exact tolerance should be retained or explicitly specified in the future test contract.
-
-**Status:** Existing test expectation. Proposed canonical representation is `[min(Prev_candle, Next_candle), max(...)]`, subject to owner approval. Source: `tests/test_offline.py`; proposal in `data_dictionary`.
-
----
-
-### Example 2 — overlapping outer candles reject the FVG
-
-**Inputs**
-
-Use Example 1 but change candle 3 low:
-
-```text
-C3 low = 199.1
-```
-
-Now candle 3 overlaps the earlier outer-candle range.
-
-**Expected output**
-
-```text
-row_count = 0
-```
-
-**Status:** Existing test expectation. It does not define whether overlap is evaluated using wick ranges, bodies, or closes in the general strategy.
-
----
-
-### Example 3 — later boundary breach invalidates the FVG
-
-**Initial FVG**
-
-```text
-Bullish lower boundary = 199.20
-Bullish upper boundary = 199.85
-```
-
-**Later M15 candle**
-
-```text
-O=199.9, H=200.0, L=199.1, C=199.3
-```
-
-**Expected output under the current test contract**
-
-```text
-FVG retained = False
-```
-
-**Proposed explicit interpretation**
-
-- Any completed-candle low below `199.20` invalidates the bullish zone.
-- Invalidation timestamp is the later candle’s close time.
-- The zone remains in immutable event history with `invalidated_at`, rather than being deleted.
-
-The last two points are proposals only.
-
----
-
-### Example 4 — proposed H1/M15 timestamp gate
-
-**Inputs**
-
-- H1 candle closes at `10:00 UTC`.
-- Its zone is first knowable at `10:00 UTC`.
-- M15 candles close at `10:15`, `10:30`, `10:45`, and `11:00 UTC`.
-- A confirmation condition is observed on the `10:30` M15 candle.
-
-**Expected proposed behavior**
-
-```text
-H1 zone available: 10:00 UTC
-M15 confirmation available: 10:30 UTC
-Earliest permissible entry decision: after 10:30 UTC
-M15 data from 10:30 onward may not be used to claim an earlier entry
-```
-
-**Status:** Proposed temporal rule based on the owner requirement to use information available at event time. Exact entry price and intrabar timing remain unresolved under **Q04–Q05**.
-
----
-
-### Example 5 — proposed 2R calculation
-
-**Inputs**
-
-- Proposed long entry: `200.00`
-- Proposed stop: `199.80`
-- Price distance: `0.20` quote-price units
-- Approved target multiple: `2R`
-
-**Expected target**
-
-\[
-R = 200.00 - 199.80 = 0.20
-\]
-
-\[
-TP = 200.00 + 2(0.20) = 200.40
-\]
-
-```text
-Initial risk distance = 0.20
-Target distance = 0.40
-Take-profit = 200.40
-```
-
-**Status:** The 2R requirement is approved. The stop location and entry price are not approved, so this is only a calculation acceptance example.
-
----
-
-### Example 6 — proposed fail-closed sizing example
-
-**Inputs**
-
-- Equity: `10,000` account-currency units
-- Approved risk fraction: `2%`
-- Risk budget: `200` account-currency units
-- Entry, stop, symbol tick value, conversion rate, spread, slippage and volume constraints: required
-
-**Expected behavior**
-
-- If any required value is missing or stale: **reject order and report missing configuration**.
-- If calculated volume is valid: round volume down to broker step.
-- If rounded volume is below broker minimum: reject.
-
-No pip value, contract size, or GBPJPY/USDJPY conversion value is supplied, so a numerical lot-size result must not be invented.
-
-**Status:** Control behavior is owner-required; the numerical sizing implementation remains unvalidated.
-
----
-
-## 5. Material inspected, blockers and next action
-
-### Material inspected or evidenced
-
-- `docs/project_overview.md`
-- `ProjectMayhem/main.py`
-- `ProjectMayhem/Execution.py`
-- `ProjectMayhem/FairValueGap.py`
-- `ProjectMayhem/OrderBlockAnalysis.py`
-- `ProjectMayhem/Liquidity.py`
-- `ProjectMayhem/Strategy.py`
-- Seven CSV snapshots under `ProjectMayhem/`
-- `tests/test_offline.py`
-- `requirements-ci.txt`
-- `.github/workflows/offline-tests.yml`
-- Repository tree and branch/workflow metadata
-
-The source-content inspection record confirms signed raw-content responses for the six modules, but did not expose their bodies inline or provide source line numbers. Conclusions about formulas are therefore limited to the supplied digest, file names, and test expectations.
-
-### Not inspected / not claimed
-
-No screenshots, Pages documents, or full PDF contents were provided. They were not reviewed and are not treated as requirements. No profitability, P&L, win rate, drawdown, profit factor, or live/paper result was derived.
-
-### Material blockers
-
-1. No independently identified GBPJPY or USDJPY market-data series.
-2. CSVs lack symbol, broker, timezone, candle-completion, spread, price-basis and provenance fields.
-3. FVG field names and invalidation semantics are not strategy-approved.
-4. Order-block direction and boundaries are unresolved.
-5. Liquidity levels and stop placement are unresolved.
-6. M15 confirmation and entry timing are unresolved.
-7. Session and maximum holding-period rules are unresolved.
-8. Portfolio exposure, daily loss and concurrency limits are unresolved.
-9. No realistic cost model or transaction-level trade data exists.
-10. Current CI evidence is for an earlier commit and has no retained artifacts.
-11. No project-owned dependency manifest beyond `requirements-ci.txt` was evidenced.
-12. Credential exposure and import-time broker side effects remain documented risks; credential values are intentionally not reproduced.
-
-### Recommended next action
-
-The product owner should resolve **Q01–Q11** in order:
-
-1. Approve canonical FVG and order-block definitions and boundary conventions.
-2. Define liquidity detection and stop-buffer rules.
-3. Define completed-candle confirmation and executable entry timing.
-4. Select sessions and numeric holding-period limits.
-5. Set aggregate exposure, concurrency, daily-loss and frequency controls.
-6. Approve a symbol-identified, timezone-aware GBPJPY/USDJPY historical dataset.
-7. Establish spread, commission, slippage and stale-data assumptions.
-8. Add deterministic unit tests for H1/M15 joins, zone lifecycle, stops, 2R targets and sizing.
-9. Re-run the isolated offline suite at the current commit and retain artifacts.
-10. Only then design a chronological development/validation/untouched-holdout simulation.
-
-**Final status:** Offline testing evidence supports only the narrow FVG fixture behavior and syntax-oriented CI checks. The intended GBPJPY/USDJPY strategy is not yet sufficiently specified for numerical backtesting, and no profitability conclusion is justified.
+- No workflow dispatch action is available in the supplied tools.
+- No workflow re-run action is available.
+- No commit, update, delete, push, pull request, or file-writing action was used or is available for this inspection.
+- No local code execution action is available.
+- No test execution was performed by this inspection.
+- No broker connection was made.
+- No MT5 initialization or authentication was performed.
+- No live, demo, or paper order was submitted.
+- No backtest or profitability evaluation was performed.
+- No artifact contents were available because the run returned no artifacts.
+- Workflow logs were downloadable, but their contents were not read.
+- Binary research files such as Pages documents, images, and PDFs were not interpreted in this inspection.
+- No claim is made that the current `main` branch ran or passed the workflow.
+- No credential values are reproduced.
