@@ -13,8 +13,8 @@ import OrderBlockAnalysis as ob
 import Liquidity as lqt
 import Strategy as s
 
-login = 5039610952
-password = 'Og-oS1Wo'
+login = 5057709180
+password = 'Q-Fe7aBa'
 server = 'MetaQuotes-Demo'
 
 mt.login(login, password, server)
