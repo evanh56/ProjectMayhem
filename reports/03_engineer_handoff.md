@@ -1,389 +1,343 @@
 # Offline-testing systems handoff
 
-## Repository observed
+## Repository state observed
 
-- Repository: `evanh56/ProjectMayhem`
-- Branch: `main`
-- Observed commit: `91860a951ea08e205ebbfd8389becce8647ebb7e` (`Correct Login`)
-- Source directory: `ProjectMayhem/`
-- Related branch: `fix/offline-testability-m15-append`
-- Related branch currently points to the same observed commit.
-- No repository changes were made.
+- **Repository:** `evanh56/ProjectMayhem`
+- **Branch:** `main`
+- **Observed commit:** `8feb36db91d7144b4a190a302634ddd30c449c0b`
+- **Source directory:** `ProjectMayhem/`
+- **No source, test, workflow, or documentation files were modified.**
+- **No broker-connected entry point was imported or run.**
+- **No credentials are reproduced.**
 
-## Workflow inspection
+A historical GitHub Actions run was supplied:
 
-Inspected:
+- **Run:** `39128978458`
+- **Head:** `ad1e0ee0b4727cbd23e9cb5d97b6e6d0a28476a8`
+- **Conclusion:** `success`
+- **Relationship to current `main`:** not applicable; the run head differs from the observed current commit.
+- **Artifacts:** none returned.
+- **Logs:** a downloadable archive descriptor was returned, but the log contents were not read.
 
-```text
-.github/workflows/offline-tests.yml
-requirements-ci.txt
-tests/test_offline.py
-```
+Therefore, there is no execution result establishing that current `main` passes offline tests.
 
-Workflow behavior:
+## Files and functions inspected
 
-- Manual `workflow_dispatch` only.
-- Ubuntu runner.
-- Python `3.11`.
-- Five-minute timeout.
-- Installs `requirements-ci.txt`.
-- Records Python version, commit, and `pip freeze`.
-- Runs:
+### Workflow and dependencies
 
-```bash
-python -m unittest discover -s tests -p 'test_offline.py' -v
-```
+- `.github/workflows/offline-tests.yml`
+  - Checks out the repository.
+  - Uses Python 3.11.
+  - Installs `requirements-ci.txt`.
+  - Runs `python -m unittest discover -s tests -p 'test_offline.py' -v`.
+  - Attempts to upload `reports/ci/`.
+  - Has `workflow_dispatch` and a push trigger only for `improvement/offline-foundation-v1`.
+  - Has no workflow inputs.
+  - Has a five-minute timeout.
 
-- Uploads `reports/ci/` for one day.
-- No workflow inputs are defined.
-- Repository contents permission is read-only.
-- Checkout credential persistence is disabled.
+- `requirements-ci.txt`
+  - Contains only:
+    ```text
+    pandas==2.2.3
+    ```
+  - This is insufficient for the runtime imports observed in the application, which include `MetaTrader5`, `pytz`, and `tzlocal`.
 
-`requirements-ci.txt` contains only:
+### Tests
 
-```text
-pandas==2.2.3
-```
+- `tests/test_offline.py`
+  - `SourceChecks.test_python_source_has_valid_syntax`
+  - `FairValueGapChecks.test_detects_bullish_gap`
+  - `FairValueGapChecks.test_detects_bearish_gap`
+  - `FairValueGapChecks.test_rejects_overlapping_outer_candles`
+  - `FairValueGapChecks.test_removes_gap_after_later_boundary_breach`
 
-### Existing workflow evidence
+The tests parse source and dynamically load only `ProjectMayhem/FairValueGap.py`. They do not import `main.py`, `Execution.py`, `Strategy.py`, `Liquidity.py`, or `OrderBlockAnalysis.py`.
 
-A real workflow run is recorded:
+### Implementation
 
-```text
-Run ID: 39128978458
-Status: completed
-Conclusion: success
-Workflow: Project Mayhem Offline Tests
-Event: workflow_dispatch
-Branch: main
-Run head: ad1e0ee0b4727cbd23e9cb5d97b6e6d0a28476a8
-Created: 2026-10-18T12:50:34Z
-```
+- `ProjectMayhem/main.py`
+  - MT5 login and account access.
+  - Candle retrieval and CSV writing.
+  - Scheduling and application entry points.
+  - `main()`, `run_scheduler()`, `check_1m()`, `check_15m()`, `check_1hr()`.
+  - Module-level MT5 login occurs before the `__main__` guard.
 
-This run was against an earlier commit than the currently observed `main` commit.
+- `ProjectMayhem/FairValueGap.py`
+  - `add_fvg()`
+  - `check_fvg()`
+  - `search_for_fvg()`
+  - `main()`
 
-No artifacts were returned:
+- `ProjectMayhem/OrderBlockAnalysis.py`
+  - `countRows()`
+  - `AddOb()`
+  - `check_prev()`
+  - `Next_candle()`
+  - `OB_check()`
+  - `Analyse_Data()`
+  - `main()`
 
-```text
-total_count: 0
-```
+- `ProjectMayhem/Liquidity.py`
+  - `Add_liq()`
+  - `check_liq()`
+  - `find_liq()`
+  - `main()`
 
-A logs ZIP was available for download, but its contents were not exposed in this inspection. Therefore, the successful conclusion is known, but individual test output and dependency contents are not independently available here.
+- `ProjectMayhem/Strategy.py`
+  - `check_trading_time()`
+  - `check_if_in_ob_hr()`
+  - `correct_dir()`
+  - `check_if_in_fvg()`
+  - `run_strategy_check()`
+  - `main()`
 
-No failure result was supplied.
+- `ProjectMayhem/Execution.py`
+  - `price_to_pip()`
+  - `taketrade()`
+  - `main()`
 
-## Tests inspected
+## Findings and evidence
 
-`tests/test_offline.py`:
+### 1. Broker side effects and credential exposure remain
 
-- Parses all Python files under `ProjectMayhem/`.
-- Dynamically loads only:
+**Path/function:** `ProjectMayhem/main.py`, module-level code and MT5 login setup.
 
-```text
-ProjectMayhem/FairValueGap.py
-```
+Observed:
 
-- Uses temporary working-directory files.
-- Tests `FairValueGap.search_for_fvg()`.
-- Uses fixture filenames:
-  - `GBPUSD_15m_Data.csv`
-  - `FairValueGap_15m.csv`
-- Tests:
-  - bullish FVG detection;
-  - bearish FVG detection;
-  - rejection of overlapping outer candles;
-  - removal after a later boundary breach.
+- MT5 login is executed at import time.
+- Credential assignments exist in the file.
+- MT5 calls include `initialize()`, `login()`, `account_info()`, `copy_rates_from_pos()`, and `shutdown()`.
 
-The test suite does not test:
+This prevents `main.py` from being safely imported by offline tests and remains a credential and isolation blocker.
 
-- GBPJPY;
-- USDJPY;
-- H1/M15 joins;
-- order blocks;
-- liquidity;
-- entry timing;
-- stops;
-- position sizing;
-- 2R target geometry;
-- costs;
-- sessions;
-- maximum holding time;
-- exposure controls;
-- broker reconciliation.
+### 2. Instrument and data-file mismatch remains
 
-The existing test is therefore a narrow FVG detector contract, not validation of the approved trading system.
+**Paths/functions:**
 
-## Relevant implementation inspected
+- `ProjectMayhem/main.py`
+- `ProjectMayhem/FairValueGap.py::search_for_fvg()`
+- `ProjectMayhem/Liquidity.py::find_liq()`
 
-The following source paths were identified and inspected through repository metadata/raw-content access:
+Observed:
 
-```text
-ProjectMayhem/main.py
-ProjectMayhem/Execution.py
-ProjectMayhem/FairValueGap.py
-ProjectMayhem/OrderBlockAnalysis.py
-ProjectMayhem/Liquidity.py
-ProjectMayhem/Strategy.py
-```
+- Runtime symbol is `GBPJPY`.
+- Data files are named `GBPUSD_15m_Data.csv` and `GBPUSD_1hr_Data.csv`.
+- No independent USDJPY stream or symbol column was observed.
 
-The raw-content responses supplied signed download locations rather than inline source bodies. Consequently, source line numbers and complete function inventories are not available from this inspection.
+### 3. Runtime dependency manifest is incomplete
 
-Observed or documented callable names:
+**Path:** `requirements-ci.txt`
 
-- `FairValueGap.search_for_fvg()`
-- `Execution.taketrade()`
-- `Execution.price_to_pip()`
-- `Execution.main()`
+Only `pandas==2.2.3` is declared, while source imports additional external packages. The CI manifest is adequate only for the supplied narrow test suite, not for the application runtime.
 
-Documented behavior includes:
+### 4. Execution and risk controls remain incomplete
 
-- `Execution.taketrade()` prints `"Work in progress"` and does not place orders.
-- `Execution.main()` returns without placing an order.
-- `main.py` contains broker-related authentication assignments and an `mt.login` call.
-- The historical entry point performs broker-related side effects at import.
-- `price_to_pip` is experimental and is not verified as a valid risk-policy implementation.
+**Path/functions:** `ProjectMayhem/Execution.py::price_to_pip()`, `taketrade()`, `main()`.
 
-No credential values are reproduced.
+Observed:
 
-## Functions suitable for isolated numerical testing
+- `taketrade()` prints `"Work in progress"` and returns.
+- No MT5 `order_send` path was observed.
+- Stop-loss and take-profit construction are absent.
+- `price_to_pip()` uses experimental balance-derived arithmetic.
+- It does not implement the documented current-equity, stop-loss-loss, contract, account-currency, cost, or broker-constraint checks.
 
-These should be pure, dependency-free functions in a future reviewed module. They are proposed interfaces, not existing functions and not applied changes.
+The documented 2% risk policy is therefore not implemented.
 
-### FVG detection
+### 5. Forming-candle and timestamp issues remain
+
+**Path/functions:** `ProjectMayhem/main.py`, candle retrieval and CSV-writing functions.
+
+Observed:
+
+- Retrieval starts at MT5 position zero.
+- No explicit completed-candle filter was observed.
+- Timestamps are converted to Europe/London and then made timezone-naive.
+- CSVs lack completion metadata, symbol identity, price basis, and extraction provenance.
+
+### 6. FVG implementation is testable but not approved as the final strategy definition
+
+**Path/function:** `ProjectMayhem/FairValueGap.py::search_for_fvg()`.
+
+Observed implementation:
+
+- Three-candle bullish and bearish conditions.
+- Raw threshold `0.00005`.
+- Later-row invalidation scans.
+- Output fields `Date`, `Prev_candle`, `Next_candle`, and `Position`.
+
+The existing tests validate selected implementation behaviour. They do not establish that these formulas are the approved FVG specification. The fixed raw-price threshold is also not instrument-normalised for GBPJPY and USDJPY.
+
+### 7. Order-block implementation remains look-ahead-sensitive
+
+**Path/functions:** `ProjectMayhem/OrderBlockAnalysis.py::OB_check()`, `Analyse_Data()`, `main()`.
+
+Observed:
+
+- Direction is based on `Open - Close > 0`.
+- Later candles are scanned for containment, activation, and invalidation.
+- A doji or equal-open/close candle falls into the bullish branch.
+- Global counters and later-row scans affect outputs.
+
+The approved OB definition, body/wick bounds, doji handling, and event-time semantics remain unresolved.
+
+### 8. Liquidity implementation remains undefined for trading use
+
+**Path/functions:** `ProjectMayhem/Liquidity.py::check_liq()`, `find_liq()`.
+
+Observed:
+
+- Raw thresholds include `0.06` and `0.00018`.
+- Levels are derived from candle highs or lows.
+- No approved sweep definition, stop offset, spread adjustment, or invalidation rule exists.
+
+### 9. Strategy state and session rules remain incomplete
+
+**Path/functions:** `ProjectMayhem/Strategy.py::run_strategy_check()`, `check_trading_time()`, `correct_dir()`, `check_if_in_fvg()`.
+
+Observed:
+
+- Global state is used for hourly and M15 zones.
+- Confirmation/indexing behaviour is incomplete.
+- A `07:00` to `02:00` crossing-midnight session is implemented, but it is not confirmed as an owner-approved session.
+- Entry, stop, expiry, and maximum holding-period rules are not complete.
+
+### 10. CI evidence is stale relative to current `main`
+
+The supplied successful run is real evidence for run `39128978458`, but its head SHA is `ad1e0ee0...`, not current `main` SHA `8feb36db...`. No current-commit pass can be inferred.
+
+The run returned no artifacts despite artifact upload being configured.
+
+## Isolated numerical-test suitability
+
+### Currently usable without MT5
+
+`ProjectMayhem/FairValueGap.py::search_for_fvg()` is the only implementation function currently exercised in an isolated manner by the supplied tests. The existing test harness dynamically loads the module with `importlib.util` and changes into a temporary working directory.
+
+This approach should remain limited to FVG until module import behaviour is independently verified.
+
+### Not currently suitable for direct isolated numerical testing
+
+- `ProjectMayhem/main.py`: unsafe to import because of module-level MT5 login and broker side effects.
+- `ProjectMayhem/Execution.py`: contains MT5-dependent account access and does not implement approved sizing.
+- `ProjectMayhem/Strategy.py`: depends on file inputs and mutable global state.
+- `ProjectMayhem/Liquidity.py`: file-oriented and stateful.
+- `ProjectMayhem/OrderBlockAnalysis.py`: file-oriented, counter-dependent, and later-row/state sensitive.
+
+### Proposed pure numerical interfaces
+
+These are recommendations only; they are not present in the repository and were not added.
 
 ```python
-def detect_fvg(candles: Sequence[Candle]) -> list[FVG]:
+def detect_fvg(candles, threshold, symbol):
     ...
-```
 
-Required behavior must first be approved, but the current test contract implies:
 
-- examine three sequential completed candles;
-- bullish gap bounds derived from first-candle high and third-candle low;
-- bearish gap bounds derived from the corresponding inverted relationship;
-- reject overlapping outer candles;
-- invalidate a gap after a later boundary breach.
-
-A canonical result should retain:
-
-```text
-symbol
-timeframe
-formed_at
-lower_bound
-upper_bound
-direction
-invalidated_at
-```
-
-The existing `Prev_candle` and `Next_candle` names should be retained only for compatibility or explicitly migrated after approval.
-
-### Order-block detection
-
-No approved order-block definition is currently available. A future isolated interface could be:
-
-```python
-def detect_order_blocks(
-    candles: Sequence[Candle],
-    *,
-    definition: OrderBlockDefinition,
-) -> list[OrderBlock]:
+def detect_order_block(candles, definition):
     ...
-```
 
-The owner must define:
 
-- source candle selection;
-- bullish/bearish direction;
-- body versus wick bounds;
-- invalidation;
-- timeframe;
-- conflict handling with FVGs.
-
-It would be incorrect to implement these semantics from the existing filename or labels alone.
-
-### 2R geometry
-
-```python
-def calculate_target(
-    *,
-    entry: Decimal,
-    stop: Decimal,
-    side: Literal["buy", "sell"],
-    reward_to_risk: Decimal = Decimal("2"),
-) -> Decimal:
+def calculate_target(entry_price, stop_price, direction, reward_risk=2.0):
     ...
-```
 
-For a long:
 
-```text
-risk_distance = entry - stop
-target = entry + 2 * risk_distance
-```
-
-For a short:
-
-```text
-risk_distance = stop - entry
-target = entry - 2 * risk_distance
-```
-
-The function should reject:
-
-- non-positive risk distance;
-- invalid side;
-- non-finite prices;
-- any reward-to-risk value other than the approved configured value when enforcing the initial strategy.
-
-### Position sizing
-
-```python
 def calculate_position_size(
-    *,
-    equity: Decimal,
-    risk_fraction: Decimal,
-    entry: Decimal,
-    stop: Decimal,
-    side: Literal["buy", "sell"],
-    value_per_price_unit: Decimal,
-    spread_cost: Decimal,
-    slippage_cost: Decimal,
-    volume_min: Decimal,
-    volume_max: Decimal,
-    volume_step: Decimal,
-) -> Decimal:
+    equity,
+    risk_fraction,
+    entry_price,
+    stop_price,
+    contract_loss_model,
+    commission,
+    slippage,
+    volume_constraints,
+):
     ...
 ```
 
-Required controls:
+The pure functions should accept explicit data and configuration, return deterministic values, and have no MT5, filesystem, credential, scheduling, or global-state dependency.
 
-- risk budget must not exceed `equity * 0.02`;
-- current equity must be supplied;
-- stop distance must be positive;
-- execution costs must be included;
-- volume must be rounded down to the broker step;
-- reject if rounded volume is below the broker minimum;
-- reject missing, stale, or invalid symbol/account conversion data;
-- do not invent pip value, contract size, or currency conversion.
+For approved 2R geometry only:
 
-This function cannot be numerically validated for GBPJPY or USDJPY from the supplied snapshots because the required symbol metadata and account-currency conversion data are absent.
+- Long: `target = entry + 2 * (entry - stop)`
+- Short: `target = entry - 2 * (stop - entry)`
 
-## Verified findings and evidence
+This is arithmetic guidance, not a completed strategy implementation.
 
-Line numbers are unavailable because the raw source bodies were not returned inline.
+Sizing must fail closed when equity, contract information, account currency, costs, stop-loss loss, or broker volume constraints are unavailable. No numeric defaults should be invented.
 
-| Finding | Evidence |
-|---|---|
-| Broker side effects and credential-related authentication exist in `ProjectMayhem/main.py` | Inspection record and `docs/project_overview.md`; exact credential values intentionally not reproduced |
-| `Execution.taketrade()` is an execution stub | Documented behavior: prints `"Work in progress"` |
-| `Execution.main()` does not place an order | Documented behavior: returns |
-| `Execution.price_to_pip()` is not verified risk sizing | `risk_policy` |
-| Existing tests cover only FVG behavior | `tests/test_offline.py` |
-| Test fixtures use `GBPUSD`, not the required GBPJPY/USDJPY datasets | `tests/test_offline.py`; CSV filenames |
-| CSV snapshots lack independent symbol identity and provenance | `data_dictionary` |
-| No separate USDJPY series was supplied | Repository tree and `data_dictionary` |
-| Timestamps lack timezone and candle-completion metadata | `data_dictionary` |
-| No execution, fill, cost, outcome, or equity-curve data exists | `data_dictionary` |
-| Current workflow evidence is from an earlier commit | Workflow run SHA versus current branch SHA |
-| No workflow artifacts were retained in the inspected run | Artifact API result |
+## Checks executed
+
+No repository tests, workflow, application modules, broker calls, backtests, or numerical simulations were executed during this handoff.
+
+The only execution evidence available is the supplied historical GitHub Actions result for run `39128978458`. Its logs were not read, its artifacts list was empty, and it does not correspond to the observed current `main` commit.
 
 ## Previously documented findings
 
-Previously documented findings still stand based on the supplied inspection record:
+Previously documented findings F01–F10 remain materially present based on the current inspection, including:
 
-- hard-coded or mismatched instrument handling;
-- GBPUSD filenames inconsistent with the stated GBPJPY/USDJPY scope;
-- absent independent USDJPY data;
-- possible append failure;
-- possible `NameError`;
-- incomplete strategy state handling;
-- scheduling limitations;
-- look-ahead risk;
-- execution stubs;
-- credential exposure/import-time broker side effects;
-- missing executable coverage for sizing, execution controls, and performance;
-- insufficient historical data for an edge claim.
+- credential exposure;
+- broker side effects on import;
+- GBPJPY/GBPUSD naming mismatch;
+- missing independent USDJPY stream;
+- append and data-handling concerns;
+- possible name/indexing errors;
+- invalid confirmation/indexing behaviour;
+- scheduling concerns;
+- look-ahead effects;
+- missing execution, sizing, and testing evidence.
 
-The source bodies and line-number evidence were not available in this session, so findings such as the possible append failure and possible `NameError` are retained as previously documented findings rather than newly re-verified defects.
-
-## Checks executed in this handoff
-
-None.
-
-I did not:
-
-- execute the repository locally;
-- install dependencies;
-- run `unittest`;
-- import application modules;
-- import MT5;
-- authenticate;
-- connect to a broker;
-- retrieve market data;
-- run a backtest;
-- dispatch or re-run the workflow;
-- modify files or branches.
-
-The existing workflow run is real repository evidence, but it was not executed by me and was not run at the currently observed commit.
-
-## Smallest coherent repair or test extension
-
-Proposed only; not applied:
-
-1. Keep broker integration out of import paths used by offline tests.
-2. Move or add pure numerical helpers for:
-   - FVG detection;
-   - approved order-block detection;
-   - 2R target geometry;
-   - fail-closed position sizing.
-3. Add deterministic unit tests using in-memory candles and explicit symbol metadata.
-4. Add tests for:
-   - completed-candle timestamp gating;
-   - no look-ahead H1/M15 joins;
-   - invalid stops;
-   - exact 2R geometry;
-   - risk cap enforcement;
-   - volume-step rounding;
-   - minimum-volume rejection;
-   - missing-data rejection.
-5. Add symbol and timezone metadata to future fixtures.
-6. Re-run the workflow at the current commit and retain artifacts.
-
-This extension must wait for owner decisions on FVG semantics, order blocks, liquidity stops, sessions, entry timing, holding period, costs, and portfolio controls.
+No finding was marked resolved by this read-only inspection.
 
 ## Assumptions and blockers
 
-- Undefined strategy or risk controls are treated as missing configuration and must fail closed.
-- The test fixture’s FVG semantics are implementation expectations, not automatically approved strategy definitions.
-- No order-block formula may be inferred from terminology alone.
-- No numerical position-size result may be produced without verified instrument and account-currency metadata.
-- No profitability, P&L, drawdown, win-rate, or trading-edge conclusion is justified.
+### Assumptions
 
-## Capabilities and files not accessible or not verified
+- The supplied inspection record is the complete evidence base.
+- The historical CI run is not treated as a current-branch test result.
+- Existing FVG tests are treated as implementation tests, not strategy approval.
+- Unresolved Q01–Q11 decisions remain unresolved.
+- No missing risk or execution parameter is replaced with a default.
 
-- Workflow dispatch capability.
-- Workflow re-run capability.
-- Readable contents of the downloaded workflow-log ZIP.
-- Workflow artifact contents; none were returned.
-- Inline source bodies for the six raw-content responses.
-- Source line numbers for implementation defects.
-- Local Python execution.
-- Local dependency installation.
-- Broker or MT5 session.
-- Credentials or account information.
-- Historical data retrieval.
-- Paper trading, live trading, or backtesting execution.
-- Full interpretation of Pages documents, screenshots, and the complete PDF.
-- Independent market-data provenance.
+### Blockers
+
+- Current `main` has not been shown to pass offline tests.
+- `main.py` cannot safely serve as an offline import target.
+- Credentials remain in source and should be rotated and removed through an approved remediation.
+- No complete runtime dependency manifest exists.
+- No symbol-specific, provenance-preserving GBPJPY and USDJPY dataset pair is available.
+- OB, FVG, liquidity, confirmation, entry, stop, session, holding-period, portfolio, and evaluation rules are not fully approved.
+- Execution and risk sizing are not implemented.
+- Binary research materials, including screenshots, PDFs, and Pages documents, were not available for review.
+
+## Capabilities and files not accessible or not performed
+
+- No local filesystem or local Python execution was available.
+- No workflow dispatch action was available.
+- No workflow rerun action was available.
+- No current-commit workflow execution was performed.
+- The historical workflow log archive was not opened or read.
+- No workflow artifacts were available; GitHub returned zero artifacts for the supplied run.
+- No broker connection, MT5 initialization, authentication, account access, paper trade, live trade, or backtest was performed.
+- No binary Pages documents, screenshots, or PDF contents were supplied for inspection.
+- No source-writing, test-writing, workflow-editing, commit, push, pull-request, merge, or deployment capability was used.
 
 ## Recommended next action
 
-The product owner should resolve Q01–Q11, then approve a reviewed offline-test change that:
+The smallest coherent repair/test extension should be proposed—not applied—as follows:
 
-- removes import-time broker side effects from testable paths;
-- establishes pure numerical interfaces;
-- adds deterministic tests for FVG, order blocks, 2R geometry, sizing, and temporal joins;
-- supplies identified GBPJPY and USDJPY data with timezone and completion metadata;
-- defines realistic cost assumptions;
-- runs and archives the suite at the current commit before any historical simulation or paper trading.
+1. Rotate and remove exposed credentials under an approved security change.
+2. Add an import-safe offline boundary so broker setup occurs only inside an explicit runtime function.
+3. Run the workflow against exact current `main` and retain its logs and artifacts.
+4. Add offline tests for:
+   - import isolation;
+   - symbol/file identity;
+   - completed-candle handling;
+   - timestamp and provenance preservation;
+   - deterministic FVG, OB, and liquidity calculations;
+   - 2R geometry;
+   - fail-closed sizing validation.
+5. Resolve Q01–Q11 before treating numerical strategy tests as evidence of trading performance.
+6. Build separate, provenance-preserving GBPJPY and USDJPY historical inputs.
+7. Only then perform chronological, cost-adjusted historical evaluation followed by controlled paper-testing review.
+
+No profitability, paper-trading, live-readiness, or risk-policy compliance conclusion is supported by the supplied evidence.

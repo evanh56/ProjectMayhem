@@ -1,276 +1,363 @@
-# Numerical Validation and Risk/Execution Handoff
+# QA / Trading Risk and Execution Handoff
 
-**Status:** No live or paper trading is authorised. No account was accessed, no credentials were used, no orders were placed, and no repository changes were made.
+## Evidence basis
 
-## Repository and revision observed
+| Item | Result | Evidence |
+|---|---|---|
+| Repository | `evanh56/ProjectMayhem` | Supplied repository inspection record |
+| Branch | `main` | Supplied repository inspection record |
+| Observed commit | `8feb36db91d7144b4a190a302634ddd30c449c0b` | Supplied repository inspection record |
+| Material inspected | `main.py`, `Execution.py`, `Strategy.py`, `FairValueGap.py`, `OrderBlockAnalysis.py`, `Liquidity.py`, tests, workflow, dependency manifest, seven CSV snapshots, supplied risk and strategy documents | Supplied inspection record and handoffs |
+| Historical CI evidence | Run `39128978458` passed at a different head, `ad1e0ee0b4727cbd23e9cb5d97b6e6d0a28476a8` | Supplied GitHub inspection record |
+| Current-commit test result | Not established | Historical CI head differs from observed `main` |
+| Orders or broker access | None | Supplied inspection record |
+| Live or paper authorisation | None | Risk policy |
 
-- Repository: `evanh56/ProjectMayhem`
-- Branch: `main`
-- Observed commit: `91860a951ea08e205ebbfd8389becce8647ebb7e`
-- Source path: `ProjectMayhem/`
-- Related branch `fix/offline-testability-m15-append` points to the same observed commit.
-- Existing CI run `39128978458` was successful but ran against earlier commit `ad1e0ee0b4727cbd23e9cb5d97b6e6d0a28476a8`; no artifacts were returned.
+This handoff does **not** authorise live trading, paper trading, broker connection, credential access, deployment, or limit changes.
 
-## Material inspected
+---
 
-- `docs/project_overview.md`
-- `ProjectMayhem/main.py`
-- `ProjectMayhem/Execution.py`
-- `ProjectMayhem/FairValueGap.py`
-- `ProjectMayhem/OrderBlockAnalysis.py`
-- `ProjectMayhem/Liquidity.py`
-- `ProjectMayhem/Strategy.py`
-- Seven CSV snapshots under `ProjectMayhem/`
-- `tests/test_offline.py`
-- `requirements-ci.txt`
-- `.github/workflows/offline-tests.yml`
-- Repository tree, branch and workflow metadata
+## Independently derived 2R geometry
 
-The source-content responses did not expose complete source bodies or line numbers. Conclusions about implementation defects are therefore limited to the supplied inspection record and documented behaviour.
+The following is arithmetic derived from the requested definition. It was not executed against the repository.
 
-## Calculation table
+| Case | Inputs and units | Formula | Result | Evidence / label |
+|---|---|---|---|---|
+| Long example | Entry `200.00` price units; stop `199.70` price units | `d = abs(entry - stop)`; `long target = entry + 2d` | `d = 0.30` price units; target `200.60` price units | Independently derived arithmetic; proposed expected result, not tool-executed |
+| Short example | Entry `200.00` price units; stop `200.30` price units | `d = abs(entry - stop)`; `short target = entry - 2d` | `d = 0.30` price units; target `199.40` price units | Independently derived arithmetic; proposed expected result, not tool-executed |
+| Zero-distance case | Entry equals stop; `d = 0` price units | Reject when `d == 0` | Rejected | Independently derived validation rule |
+| Invalid long-side case | Stop is not below entry | Long-side validation requires a positive protective distance in the expected direction | Rejected | Independently derived validation rule |
+| Invalid short-side case | Stop is not above entry | Short-side validation requires a positive protective distance in the expected direction | Rejected | Independently derived validation rule |
 
-| Item | Inputs and units | Formula | Result | Evidence source | Label |
-|---|---|---|---|---|---|
-| Initial risk budget | Equity \(E\), account-currency units; risk fraction \(r\), dimensionless | \(B = E \\times r\) | Must use current equity and approved \(r \\le 0.02\) | `risk_policy`, D002 | **Policy requirement; not executed** |
-| Worked risk budget | \(E = 10{,}000\) account-currency units; \(r = 0.02\) | \(10{,}000 \\times 0.02\) | \(200\) account-currency units | Supplied engineer handoff | **Independently derived arithmetic; not tool-executed** |
-| 2R distance | Entry \(P_e\), stop \(P_s\), quote-price units | \(d = |P_e-P_s|\) | Positive distance required | User instruction | **Approved calculation rule** |
-| Long target | \(P_e\), \(d\), quote-price units | \(TP = P_e + 2d\) | Determined from supplied entry and stop | User instruction, D002 | **Approved calculation rule** |
-| Short target | \(P_e\), \(d\), quote-price units | \(TP = P_e - 2d\) | Determined from supplied entry and stop | User instruction, D002 | **Approved calculation rule** |
-| Long worked example | Entry 200.00, stop 199.80, quote-price units | \(d=|200.00-199.80|=0.20\); \(TP=200.00+2(0.20)\) | \(d=0.20\); target 200.40 | Supplied engineer handoff | **Independently derived arithmetic; not tool-executed** |
-| Short worked example | Entry 200.00, stop 200.20, quote-price units | \(d=|200.00-200.20|=0.20\); \(TP=200.00-2(0.20)\) | \(d=0.20\); target 199.60 | User-specified formula applied to proposed values | **Independently derived arithmetic; not tool-executed** |
-| Invalid 2R inputs | \(d=0\), or side not `long`/`short` | Reject if \(d \\le 0\) or side invalid | No target produced | User instruction | **Required deterministic control** |
-| Risk per volume | Entry/stop distance in price units; tick size in price units; tick value in account currency per tick per volume unit; volume \(v\) | \(\text{gross stop loss}=v \\times (d/\text{tick size}) \\times \text{tick value}\) | Requires verified broker specification | `risk_policy` | **Required formula; not numerically executable from supplied data** |
-| Cost-adjusted risk | Gross stop loss; spread, commission, expected slippage and other costs in account currency | \(\text{total intended risk}=\text{gross stop loss}+\text{spread cost}+\text{commission}+\text{slippage allowance}\) | Must not exceed risk budget | `risk_policy`, `data_dictionary` | **Required control; cost values missing** |
-| Maximum unrounded volume | Risk budget \(B\), per-volume loss \(L_v\), account currency | \(v_{\max}=B/L_v\) | Cannot calculate without verified \(L_v\) | `risk_policy` | **Required formula; no lot size invented** |
-| Broker-rounded volume | \(v_{\max}\), volume step \(s\) | \(v_{\text{rounded}}=\lfloor v_{\max}/s\rfloor s\) | Round down only | `risk_policy` | **Required deterministic control** |
-| Minimum-volume check | Rounded volume; broker minimum \(v_{\min}\) | Reject if \(v_{\text{rounded}}<v_{\min}\) | No order if minimum exceeds risk budget | `risk_policy` | **Required deterministic control** |
+The approved strategy target is exactly **2R**. The worked prices above are examples only and are not repository data or trading instructions.
 
-### Missing sizing inputs
+---
 
-A tradable lot size cannot be calculated from the supplied material. Required inputs are missing or unverified:
+## Position-sizing control
 
-1. Current account equity.
-2. Account currency.
-3. Symbol-specific contract size.
-4. Tick size.
-5. Tick value and whether it is quoted in account currency.
-6. Volume minimum, maximum and step.
-7. Verified entry and stop prices.
-8. Bid/ask spread at submission.
-9. Commission schedule.
-10. Slippage allowance or execution-cost model.
-11. Currency conversion rates for any non-account-currency profit or loss.
-12. Margin and stop/freeze-level restrictions.
-13. Symbol identity and broker specification for both GBPJPY and USDJPY.
+The approved risk fraction is no greater than **2%**, represented mathematically as:
 
-The supplied CSVs do not provide these values. No lot size, pip value or conversion rate should be inferred.
+```text
+risk_fraction <= 0.02
+```
+
+The repository does not provide enough verified inputs to calculate a tradable volume.
+
+### Required formula
+
+Let:
+
+```text
+risk_budget_account_currency
+    = current_equity_account_currency × approved_risk_fraction
+
+stop_distance_ticks
+    = abs(entry_price - stop_price) / verified_tick_size
+
+gross_stop_loss(volume)
+    = stop_distance_ticks
+      × verified_tick_value_account_currency_per_volume_unit
+      × volume
+
+total_intended_loss(volume)
+    = gross_stop_loss(volume)
+      + commission(volume)
+      + spread_cost(volume)
+      + permitted_slippage_allowance(volume)
+```
+
+The valid volume must satisfy:
+
+```text
+total_intended_loss(volume) <= risk_budget_account_currency
+```
+
+Then:
+
+```text
+rounded_volume
+    = floor(raw_volume / volume_step) × volume_step
+```
+
+The application must reject when:
+
+- required inputs are missing or stale;
+- the calculated volume is below the broker minimum;
+- the calculated volume exceeds the broker maximum;
+- the rounded volume is zero;
+- post-rounding loss exceeds the risk budget;
+- entry or stop violates price precision, stop-level, or freeze-level rules;
+- account currency conversion is unavailable or stale.
+
+`contract_size` must also be verified because tick-value interpretation can depend on the instrument specification and volume convention.
+
+### Required inputs and current availability
+
+| Input | Units | Required use | Current evidence |
+|---|---|---|---|
+| Current equity | Account currency | Establish the `2%` risk budget | Not supplied as a verified runtime value |
+| Account currency | Currency code | Convert instrument loss and costs | Not supplied |
+| Approved risk fraction | Decimal fraction, maximum `0.02` | Risk budget | Owner requirement in `risk_policy` |
+| Entry price | Instrument price units | Stop distance and execution cost | Entry rule unresolved |
+| Stop price | Instrument price units | Stop distance | Liquidity stop and stop rule unresolved |
+| Tick size | Instrument price units per tick | Convert price distance to ticks | Not supplied |
+| Tick value | Account currency per tick per volume unit | Monetary stop-loss calculation | Not supplied |
+| Contract size | Base units per broker volume unit | Validate monetary conversion | Not supplied |
+| Volume minimum | Broker volume units | Minimum-volume validation | Not supplied |
+| Volume maximum | Broker volume units | Maximum-volume validation | Not supplied |
+| Volume step | Broker volume units | Round down deterministically | Not supplied |
+| Commission | Account currency per volume or transaction | Include transaction costs | Not specified |
+| Spread | Price or account-currency cost | Include entry/exit cost | Not specified |
+| Slippage allowance | Price or account-currency cost | Stress intended loss | Not specified |
+| Currency conversion rate | Conversion-rate units | Convert loss to account currency | Not supplied |
+| Fresh bid/ask quote | Instrument price units | Recheck sizing at submission | Not available without broker data |
+| Stop/freeze constraints | Price units | Validate order and protective order placement | Not supplied |
+
+No tradable lot size is calculated or invented.
+
+### Current implementation assessment
+
+`Execution.py::price_to_pip()` is experimental and does not implement the required equity, account-currency, contract, cost, stop-distance, or broker-volume validation. `taketrade()` is a stub and no order-placement path was observed.
+
+---
 
 ## Intended stop risk versus realised loss
 
-The 2% value is an **intended risk budget**, not a guaranteed maximum realised loss.
+The intended stop risk is a budgeted estimate, not a guaranteed maximum realised loss.
 
-Realised loss can exceed the calculated stop risk because:
+### Intended calculation
 
-- a gap can cause the stop to fill away from its stop price;
-- fast-market slippage can exceed the configured allowance;
-- spread widening can trigger or worsen execution;
-- stop/freeze restrictions can delay or reject protective-order changes;
-- connection loss can prevent submission, modification or closure;
-- partial fills can leave residual exposure;
-- commissions and financing costs add to the loss;
-- a rejected or missing protective order can leave the position unprotected;
-- restart or reconciliation failures can cause local state to differ from broker state.
+```text
+intended_stop_loss
+    = price-distance loss at the verified stop
+      + commission
+      + spread cost
+      + defined slippage allowance
+```
 
-The application must report both:
+This must remain no greater than the approved risk budget after volume rounding.
 
-- **planned/intended risk** at submission; and
-- **actual realised loss** after fills, costs and conversion.
+### Circumstances that can exceed intended loss
 
-It must not describe the stop as a guaranteed loss limit.
+- price gaps through the stop;
+- market slippage during fast movement or news;
+- spread widening causing an adverse fill or stop trigger;
+- rejected, delayed, or missing protective orders;
+- connection loss between signal, entry, and protection;
+- partial fill where the protection volume is incomplete;
+- broker execution rules differing from the assumed model;
+- stale quotes used for sizing;
+- incorrect tick-value or currency conversion;
+- restart before position reconciliation;
+- duplicate entry submission;
+- commission or swap costs omitted from the model;
+- stop or volume rounding changing the actual exposure.
+
+The application must expose these as risk states and fail closed where protection or sizing cannot be verified.
+
+---
 
 ## Combined GBPJPY and USDJPY exposure
 
-The two instruments share JPY as the quote currency:
+For an instrument quoted as `BASE/JPY`, define signed JPY exposure as:
 
-- A **long GBPJPY** is long GBP and short JPY.
-- A **long USDJPY** is long USD and short JPY.
-- Holding both long positions creates combined short-JPY exposure.
-- A **short GBPJPY** and **short USDJPY** create combined long-JPY exposure.
-- Opposing positions may reduce directional JPY exposure but still retain basis, spread, timing, and instrument-specific risks.
-- GBPJPY also carries GBP exposure; USDJPY carries USD exposure. They are not interchangeable or perfectly hedged.
+```text
+JPY_exposure
+    = -direction × base_volume × contract_size × execution_price
+```
 
-The application must calculate exposure from actual position quantities and current conversion rates, then aggregate:
+where:
 
-1. gross notional exposure;
-2. net JPY exposure;
-3. directional exposure by instrument;
-4. aggregate open risk to protective stops;
-5. exposure after pending orders and partial fills.
+- `direction = +1` for a long position;
+- `direction = -1` for a short position;
+- `base_volume × contract_size` is base-currency notional;
+- execution price is JPY per unit of base currency.
 
-No numerical combined exposure can be calculated because no positions, quantities, prices, contract specifications or conversion rates were supplied.
+Therefore:
+
+| Position | Base exposure | JPY exposure |
+|---|---|---|
+| Long GBPJPY | Long GBP | Short JPY |
+| Short GBPJPY | Short GBP | Long JPY |
+| Long USDJPY | Long USD | Short JPY |
+| Short USDJPY | Short USD | Long JPY |
+
+Two long positions in GBPJPY and USDJPY both create short JPY exposure. Two short positions both create long JPY exposure. Opposite directions can offset JPY exposure, but they still retain separate GBP and USD risks and may not hedge one another reliably.
+
+The portfolio control must calculate, at minimum:
+
+```text
+net_JPY_exposure
+    = signed GBPJPY JPY exposure
+      + signed USDJPY JPY exposure
+```
+
+It should also retain:
+
+- gross JPY exposure;
+- directional JPY exposure;
+- GBP notional;
+- USD notional;
+- per-symbol open risk;
+- aggregate open risk;
+- stress loss under adverse JPY movement;
+- correlation and concentration flags.
+
+No account positions, volumes, prices, or account currency were supplied. Consequently, no numerical combined exposure is calculated.
+
+---
 
 ## Missing account-level limits
 
-The approved material specifies only an initial maximum intended risk of **2% per trade** and a planned **2R** target. The following remain undefined and must be treated as missing configuration rather than unlimited:
+The following controls are absent or unresolved and must not be treated as unlimited or zero:
 
 - maximum concurrent positions;
+- maximum concurrent positions per symbol;
 - maximum aggregate open risk;
 - maximum combined JPY exposure;
-- maximum gross and net portfolio exposure;
-- daily loss limit;
-- daily realised plus unrealised loss treatment;
+- maximum gross notional;
+- maximum daily loss;
 - maximum drawdown;
 - maximum trades per day;
-- per-symbol trade limits;
-- cooldown after a loss or rejected order;
+- cooldown after a loss or execution failure;
 - maximum holding period;
-- spread, slippage and stale-data thresholds;
-- news or market-closure restrictions;
-- emergency shutdown threshold.
+- maximum spread;
+- maximum slippage;
+- minimum market-data freshness;
+- maximum retry count;
+- emergency shutdown condition;
+- behaviour after a rejected or partially filled order.
 
-Orders must fail closed when any required limit is undefined.
+The risk policy requires undefined execution controls to fail closed.
+
+---
 
 ## Required deterministic execution controls
 
-The application must reject or halt in the following cases:
+The application must implement and test the following controls rather than relying on operator or agent instructions.
 
-### Stale or incomplete data
+### Order rejection and validation
 
-Reject the signal when:
+Reject before submission when:
 
-- quote age exceeds the approved threshold;
-- bid or ask is missing, non-finite or inconsistent;
-- the candle is not confirmed complete;
-- symbol, timeframe, timezone or broker identity is missing;
-- required H1/M15 history is incomplete;
-- spread exceeds its approved bound.
-
-### Rejected or partially filled orders
-
-- Record broker request and response identifiers.
-- Do not assume rejection means no exposure; reconcile actual broker positions.
-- For a partial fill, recalculate residual risk and attach protection to the filled quantity.
-- Reject or cancel the remainder if the resulting exposure would breach limits.
-- Do not resubmit blindly.
+- symbol identity is not verified;
+- quote data is stale or incomplete;
+- entry, stop, or target is invalid;
+- risk sizing inputs are missing;
+- aggregate limits would be breached;
+- volume cannot be rounded within broker constraints;
+- spread, slippage, margin, or stop-level checks fail;
+- the strategy decision is duplicated or has expired.
 
 ### Duplicate submissions
 
-Use a deterministic client order identifier derived from strategy signal, symbol, side and signal timestamp. Before submission and after timeout:
+Each signal and order requires a persistent unique identifier. The system must:
 
-- check local idempotency state;
-- query broker orders and positions;
-- suppress a duplicate if an equivalent order or position exists;
-- use bounded retries only.
+- reject an already-submitted signal ID;
+- use an idempotency key where supported;
+- record request, response, broker order ID, and timestamps;
+- prevent retries from creating a second position;
+- reconcile broker state before retrying after an uncertain response.
 
-### Disconnects and timeouts
+### Disconnects and bounded retries
 
-- Enter a fail-closed state.
-- Stop new submissions.
-- Reconnect with bounded retry count and timeout.
-- Reconcile broker orders, positions and fills before resuming.
-- Escalate if reconciliation cannot be completed.
-- Do not infer broker state from local CSV files.
+On connection loss:
 
-### Restart and reconciliation
+- stop new submissions;
+- preserve the pending request and state;
+- use bounded retries only;
+- do not assume an unsuccessful response means no order exists;
+- query broker state before retrying;
+- escalate to emergency handling when position protection cannot be verified.
 
-On startup or restart:
+### Partial fills
 
-1. load local state;
-2. query broker positions, orders, fills and account equity;
-3. compare broker state with local state;
-4. identify unknown, duplicate, orphaned or unprotected positions;
-5. halt new trading until discrepancies are resolved;
-6. verify protective orders for every open position.
+For a partial fill:
+
+- record filled and remaining quantities separately;
+- place or verify protection for the filled quantity;
+- recalculate residual exposure;
+- cancel or expire the remainder according to the approved order policy;
+- recheck aggregate limits;
+- prevent the unfilled remainder from being treated as an active position.
+
+### Restarts
+
+On restart:
+
+- enter reconciliation mode before new signals;
+- reload durable signal, order, fill, and position records;
+- query broker positions and working orders;
+- match broker records to internal records;
+- identify unknown, missing, duplicate, or unprotected positions;
+- block trading until discrepancies are resolved or emergency shutdown is approved.
 
 ### Protective orders
 
-A position must not be considered valid unless its stop and target status are confirmed. The system must:
+For every fill:
 
-- verify protective orders after fill;
-- reject or immediately escalate an unprotected position;
-- never widen a stop;
-- never average down or increase risk after a loss;
-- avoid changing approved controls after an individual trade.
+- verify the protective stop exists at the approved level;
+- verify its volume covers the filled position;
+- reject or escalate if protection is absent, rejected, or materially different;
+- never widen the stop or increase risk automatically.
 
 ### Emergency shutdown
 
-A deterministic emergency stop must:
+The system requires a deterministic emergency-stop mechanism that:
 
-- prevent new orders;
-- cancel eligible pending orders;
-- attempt protection or closure according to an owner-approved procedure;
-- preserve audit logs;
-- reconcile final broker state;
-- require explicit operator review before resumption.
+- blocks new orders;
+- cancels eligible working entry orders;
+- reports all open positions and protection status;
+- handles unknown order state conservatively;
+- persists the shutdown reason;
+- requires explicit authorised recovery.
+
+---
 
 ## Credential handling
 
-Credential locations identified in the supplied material:
+Credential locations observed:
 
-- `ProjectMayhem/main.py`, including documented module-level authentication assignments and an `mt.login` call.
+- `ProjectMayhem/main.py`, including module-level broker configuration and login logic;
+- authentication examples or placeholders in `docs/Strategy.txt`.
 
-Credential values are intentionally not reproduced.
+Credential values are not reproduced. Exposed credentials should be rotated and removed from source and history through an approved security process. Broker authentication must not occur during module import, and offline tests must not require or access credentials.
 
-Required actions:
-
-- remove embedded credentials from source;
-- rotate any credentials that may have been committed;
-- use secret management for any future broker-connected environment;
-- remove import-time broker login side effects;
-- keep offline tests secret-free;
-- do not connect to an account for this validation.
+---
 
 ## Prioritised paper-trading blockers
 
-Paper trading should not begin until the following are resolved:
+Paper trading should remain blocked until the following are resolved and evidenced:
 
-### P0 — hard blockers
+| Priority | Blocker |
+|---|---|
+| Critical | Remove or rotate exposed credentials and make imports broker-free |
+| Critical | Define and test current-equity, account-currency, cost-inclusive position sizing |
+| Critical | Implement protective-order handling, rejection, partial-fill, duplicate, disconnect, restart, and reconciliation controls |
+| Critical | Resolve GBPJPY/GBPUSD mismatch and provide an independent USDJPY stream |
+| Critical | Define Q01–Q08: zones, direction, confirmation timing, entry, stop, session, and holding period |
+| Critical | Define Q09–Q10 account-level limits, including aggregate open risk and shared JPY exposure |
+| High | Preserve timestamp, timezone, completion, symbol, price-basis, and extraction provenance |
+| High | Remove look-ahead effects from FVG, OB, liquidity, and confirmation logic |
+| High | Establish a complete dependency manifest and run tests against the exact current commit |
+| High | Add deterministic numerical tests for 2R geometry and fail-closed sizing |
+| High | Define costs, slippage, spread, freshness, and broker constraint assumptions |
+| High | Define Q11 evaluation evidence, chronological data splits, acceptance criteria, and promotion gates |
 
-1. Remove credential exposure and import-time broker side effects.
-2. Define Q01–Q11, including entry, stop, confirmation timing, sessions and holding period.
-3. Define aggregate open-risk, concurrency, daily-loss, drawdown and JPY-exposure limits.
-4. Implement and test fail-closed sizing using verified symbol and account-currency specifications.
-5. Implement broker-state reconciliation, duplicate prevention, partial-fill handling and protective-order verification.
-6. Supply identified, timezone-aware GBPJPY and USDJPY data with candle-completion metadata.
-7. Establish spread, commission and slippage assumptions.
-
-### P1 — required before meaningful numerical evaluation
-
-8. Add deterministic tests for 2R geometry, sizing, rounding, minimum volume and invalid inputs.
-9. Add no-look-ahead H1/M15 temporal-join tests.
-10. Add immutable signal/order/fill/trade records with unique identifiers.
-11. Re-run CI at the current commit and retain readable artifacts.
-12. Establish chronological development, validation and untouched evaluation windows.
-
-### P2 — required before any promotion decision
-
-13. Demonstrate paper execution over an approved evaluation period.
-14. Reconcile every order, fill, position, cost and equity update with the broker.
-15. Measure realised loss, slippage, rejected orders, disconnections, duplicate attempts and protection failures.
-16. Obtain independent QA/risk review and product-owner approval.
+---
 
 ## Checks executed
 
-**None.**
+No tests, numerical simulations, imports, broker calls, backtests, paper trades, or live trades were executed for this handoff.
 
-No repository code was run, no dependencies were installed, no workflow was dispatched or rerun, no broker or MT5 session was opened, and no paper or live order was submitted.
+The historical CI result is not treated as current evidence because its head differs from the observed `main` commit and no artifacts were returned.
 
-The arithmetic examples above are independently derived from stated inputs and formulas; they are not tool-executed results.
-
-## Assumptions and blockers
-
-- The 2% figure is the approved initial maximum intended per-trade risk, not a guarantee of realised loss.
-- The 2R target is approved, but entry and stop definitions are unresolved.
-- Undefined controls are missing configuration and must fail closed.
-- Existing FVG tests are narrow implementation expectations, not approval of the complete trading strategy.
-- No numerical lot size is available or appropriate without broker specifications and account-currency conversion.
-- No profitability, drawdown, execution-quality or trading-edge conclusion is justified.
+---
 
 ## Recommendation
 
-**Release recommendation: Reject for paper trading and live trading.**
+**Recommendation: reject paper-trading promotion and reject any live release.**
 
-The repository does not yet provide a numerically validated, operationally reliable implementation of the approved GBPJPY/USDJPY strategy. The release is blocked by unresolved strategy and account-level limits, absent verified instrument metadata and cost inputs, incomplete execution controls, credential/import risks, lack of reconciliation evidence, and absence of current-revision numerical tests.
+The repository is an incomplete MT5 prototype. Execution is stubbed, approved position sizing is absent, instrument data is inconsistent, USDJPY is not independently represented, portfolio and JPY exposure limits are undefined, and key order-lifecycle controls are unimplemented or unverified.
 
-Final release authority remains with the product owner.
+The next release should be limited to an offline, secret-free numerical-validation release. It should not connect to an account or submit orders until the blockers above have deterministic implementation, independent tests, current-commit evidence, and product-owner approval.
