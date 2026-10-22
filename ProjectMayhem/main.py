@@ -55,7 +55,11 @@ def _write_rows(path, frame, append):
 def write_15m(data, path=M15_FILE, initial_run_complete=None):
     global INITIAL_RUN_COMPLETE
     complete = INITIAL_RUN_COMPLETE if initial_run_complete is None else initial_run_complete
+    if data.empty:
+        return
+        
     frame = data if not complete else data.iloc[[-1]]
+    
     _write_rows(path, frame, append=complete)
     if initial_run_complete is None and not complete:
         INITIAL_RUN_COMPLETE = True
