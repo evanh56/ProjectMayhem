@@ -1,0 +1,14 @@
+test_empty_incremental_input_writes_nothing (test_engineering.EngineeringChecks.test_empty_incremental_input_writes_nothing) ... ok
+test_incremental_write_appends_one_row (test_engineering.EngineeringChecks.test_incremental_write_appends_one_row) ... ok
+test_main_imports_without_mt5 (test_engineering.EngineeringChecks.test_main_imports_without_mt5) ... ok
+test_no_credential_literal_in_project_source (test_engineering.EngineeringChecks.test_no_credential_literal_in_project_source) ... ok
+test_detects_bearish_gap (test_offline.FairValueGapChecks.test_detects_bearish_gap) ... ok
+test_detects_bullish_gap (test_offline.FairValueGapChecks.test_detects_bullish_gap) ... ok
+test_rejects_overlapping_outer_candles (test_offline.FairValueGapChecks.test_rejects_overlapping_outer_candles) ... ok
+test_removes_gap_after_later_boundary_breach (test_offline.FairValueGapChecks.test_removes_gap_after_later_boundary_breach) ... ok
+test_python_source_has_valid_syntax (test_offline.SourceChecks.test_python_source_has_valid_syntax) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.023s
+
+OK
