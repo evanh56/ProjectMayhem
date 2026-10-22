@@ -1,24 +1,25 @@
-# Researcher handoff — scoped engineering repair
+# Researcher handoff — constrained engineering patch
 
+**Specification:** RS-ENG-0.1  
 **Baseline:** `main` at `8feb36db91d7144b4a190a302634ddd30c449c0b`
 
 ## Authorised scope
 
-1. Offline-safe imports and explicit broker startup.
-2. Removal of embedded credentials from current source.
-3. Repair of M15 incremental CSV writing.
-4. Regression tests and test discovery.
+1. Make imports offline-safe and broker startup explicit.
+2. Remove embedded credentials from current source without reproducing them.
+3. Repair M15 incremental CSV writing.
+4. Add regression tests and ensure test discovery.
 
-No strategy redesign, trading, broker connection, or production execution is authorised.
+No strategy redesign, trading, broker connection, profitability claim, or production execution is authorised.
 
-## Constraints
+## Behavioural constraints
 
-Existing FVG, order-block, liquidity, 2R, 2% risk, H1/M15 confirmation, and no-forced-trade definitions must remain unchanged. Duplicate handling and completed-candle semantics remain unresolved and must not be decided implicitly by this repair.
+FVG, order-block, liquidity, 2R, intended 2% risk, and M15 confirmation behaviours must remain unchanged. Import/startup separation is the intentional runtime-boundary change. The M15 writer must preserve paths, columns, ordering, serialisation, timestamps, precision, initial writes, and genuine appends, while making empty input a no-op with no file mutation. Deduplication, sorting, schema migration, timestamp reconciliation, and other ambiguous behaviours must not be invented.
 
-## Writer contract
+## Proposed regression evidence
 
-Preserve the existing CSV header, column order, serialization, and input ordering. Before initial completion write all received rows. After initial completion write only the newest row without rewriting the file. Do not introduce deduplication, timestamp sorting, timezone relabelling, or strategy filtering. Empty input must not create market data.
+Test import isolation, credential-removal structure without printing secrets, empty and non-empty writer paths, existing-file preservation, existing FVG regressions, and CI discovery. The engineer was instructed to characterise the writer, move MT5 startup behind explicit invocation, remove credentials, add tests, and run CI against the exact development commit.
 
-## Proposed regression coverage
+## Handoff conclusion
 
-Offline import isolation, explicit startup, missing-configuration failure, absence of embedded credential values, initial and incremental M15 writes, empty input, existing FVG tests, and configured unittest discovery were proposed. Evidence from later handoffs is recorded separately.
+The repair may improve testability and prevent invalid M15 writes, but supplies no evidence that the strategy is profitable, executable, non-repainting, or ready for paper or live trading.

@@ -1,29 +1,12 @@
-# QA handoff — candidate `86f30dc353dda2aaf5ce8f8a292980c26983f94c`
+# QA handoff — `improvement/offline-foundation-v1`
 
-## QA result
+**Candidate commit:** `6049e11fe11e8ac3e39b5bb7b06019476ed26337`  
+**QA status:** Tests passed in QA sandbox, awaiting GitHub run.
 
-**Status: Tests failed.** QA independently inspected the committed files in a sandbox copy. This was not GitHub Actions.
+QA inspected the application modules, tests, workflow, and requirements. On a copy of the committed files, with no MetaTrader5 package, broker, credentials, or network broker access, QA installed `pandas==2.2.3`, used Python `3.11.6`, and ran `python -m unittest discover -s tests -p 'test_*.py' -v`. The result was `Ran 9 tests in 0.022s` and `OK`. An initial attempt failed because pandas was unavailable; after installing the pinned dependency, discovery passed.
 
-Command:
+Passed coverage included the empty incremental writer case, one-row append, main import without MT5, credential-literal check in the scoped project source, four FVG tests, and Python syntax. The implementation uses an empty-frame early return, initial write mode `w`, append mode `a`, the columns `Date,Open,High,Low,Close`, timezone removal, three-decimal price rounding, and no sorting or deduplication.
 
-```text
-python -m unittest discover -s tests -p 'test_*.py' -v
-```
+QA identified material limitations: `ProjectMayhem/Execution.py` retains a module-level `import MetaTrader5 as mt`, so all-module import isolation is not met; the import test checks only `main.py`; credential scanning is not repository-wide; existing-file byte preservation is not directly tested; and duplicate, ordering, malformed-header, and legacy-file behaviours remain uncharacterised.
 
-Environment: Python 3.13 environment; `MetaTrader5` was unavailable; no broker credentials or broker connection were available.
-
-Result:
-
-```text
-Ran 9 tests in 0.073s
-FAILED (errors=1)
-RETURN 1
-```
-
-Eight tests passed and one failed: `test_empty_incremental_input_writes_nothing`. The failure was an `IndexError: positional indexers are out-of-bounds` from `data.iloc[[-1]]` before the empty-input guard. The normal initial/incremental append test, import-isolation test, credential-literal source check, and all five starter tests passed.
-
-QA found discovery working for both test modules and statically found the workflow requirements conforming. The candidate GitHub run was still in progress, so it provided no completed result or artifact.
-
-## Required correction
-
-Guard empty input before selecting `data.iloc[[-1]]`, ensuring empty incremental input leaves the output file uncreated or unchanged. Then rerun discovery and obtain a completed matching GitHub Actions result.
+The supplied Actions run was run `39777938055`, head `6049e11fe11e8ac3e39b5bb7b06019476ed26337`, success on the development branch. QA did not independently retrieve it and therefore retained the status “awaiting GitHub run.”

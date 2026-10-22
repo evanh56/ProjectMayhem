@@ -1,14 +1,5 @@
-# Run-check record
+# Run check
 
-- Candidate SHA: `86f30dc353dda2aaf5ce8f8a292980c26983f94c`
-- Branch: `improvement/offline-foundation-v1`
-- Matching workflow run: `39696807306`
-- Event: `push`
-- Head SHA: `86f30dc353dda2aaf5ce8f8a292980c26983f94c`
-- Reported status: `in_progress`
-- Reported conclusion: unavailable/null
-- Jobs, artifacts, and logs were not inspected because the run was not completed.
+The run-check source returned no data: it stated that it was unable to read the complete current file contents required by STEP 1. No additional run-check instructions were supplied by that handoff.
 
-The baseline record also reported a different successful run, `39694465650`, for head SHA `b23f47b4b0e294b29bc69c5c2a8ae643a712d648`; it does not validate the candidate.
-
-No manual instructions were supplied by the run check beyond waiting for completion and obtaining completed evidence. No workflow was dispatched or rerun.
+Supplied evidence separately lists GitHub Actions run `39777938055` with head SHA `6049e11fe11e8ac3e39b5bb7b06019476ed26337`, completed successfully on `improvement/offline-foundation-v1`. Because the supplied tool evidence in this delivery did not independently retrieve the run, the report records the run as supplied evidence rather than newly verified execution. No workflow was dispatched or rerun.
