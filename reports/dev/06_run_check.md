@@ -1,5 +1,16 @@
 # Run check
 
-The run-check source returned no data: it stated that it was unable to read the complete current file contents required by STEP 1. No additional run-check instructions were supplied by that handoff.
+## Structured fields
 
-Supplied evidence separately lists GitHub Actions run `39777938055` with head SHA `6049e11fe11e8ac3e39b5bb7b06019476ed26337`, completed successfully on `improvement/offline-foundation-v1`. Because the supplied tool evidence in this delivery did not independently retrieve the run, the report records the run as supplied evidence rather than newly verified execution. No workflow was dispatched or rerun.
+- status: Blocked
+- starting_commit: `8a1160db7379a3014b9c2d8743983b9720f3b2fe`
+- candidate_commit: none
+- files_changed: none
+- commands_executed: none
+- test_result: not executed
+
+## Evidence
+
+The engineer handoff explicitly reports `candidate_commit: none`. Per the gate, no workflow, branch, or commit checks were performed for an implementation candidate.
+
+No manual workflow instructions were supplied by the run check. The source returned no commands for installing, configuring, launching, checking status, stopping, or restarting a trading application.

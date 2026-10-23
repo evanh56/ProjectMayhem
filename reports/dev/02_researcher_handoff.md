@@ -1,25 +1,19 @@
-# Researcher handoff — constrained engineering patch
+# Researcher handoff — DEMO-only strategy specification
 
-**Specification:** RS-ENG-0.1  
-**Baseline:** `main` at `8feb36db91d7144b4a190a302634ddd30c449c0b`
+The supplied researcher handoff is a research/specification handoff only. No code was changed, no commands were run, no broker was accessed, and no trades were placed.
 
-## Authorised scope
+## Status
 
-1. Make imports offline-safe and broker startup explicit.
-2. Remove embedded credentials from current source without reproducing them.
-3. Repair M15 incremental CSV writing.
-4. Add regression tests and ensure test discovery.
+- status: Research-stage specification and engineering handoff; no implementation or trading authorization
+- starting_commit: `main` at `f9b530de4f48c7bc94a3c92fd068afec03f4b787`
+- candidate_commit: none - research stage
+- files_changed: none
+- test_result: not applicable
 
-No strategy redesign, trading, broker connection, profitability claim, or production execution is authorised.
+## Key blockers
 
-## Behavioural constraints
+Unverified GBPJPY/USDJPY data provenance; GBPUSD filename/runtime-symbol mismatch; absent timezone and completed-candle metadata; unresolved Q01–Q11 strategy definitions; incomplete execution and reconciliation; incomplete risk controls; no current-commit test execution; no chronological performance evidence.
 
-FVG, order-block, liquidity, 2R, intended 2% risk, and M15 confirmation behaviours must remain unchanged. Import/startup separation is the intentional runtime-boundary change. The M15 writer must preserve paths, columns, ordering, serialisation, timestamps, precision, initial writes, and genuine appends, while making empty input a no-op with no file mutation. Deduplication, sorting, schema migration, timestamp reconciliation, and other ambiguous behaviours must not be invented.
+## Specification status
 
-## Proposed regression evidence
-
-Test import isolation, credential-removal structure without printing secrets, empty and non-empty writer paths, existing-file preservation, existing FVG regressions, and CI discovery. The engineer was instructed to characterise the writer, move MT5 startup behind explicit invocation, remove credentials, add tests, and run CI against the exact development commit.
-
-## Handoff conclusion
-
-The repair may improve testability and prevent invalid M15 writes, but supplies no evidence that the strategy is profitable, executable, non-repainting, or ready for paper or live trading.
+The handoff defines proposed completed-candle H1/M15 sequencing, normalized FVGs, configurable order blocks, liquidity-based stops, executable bid/ask entry, immutable 2R geometry, a 2% maximum risk ceiling, conservative demo defaults, fail-closed controls, broker-boundary requirements, provenance rules, unresolved decisions Q01–Q11, and acceptance criteria. These remain specification material, not implemented behavior.

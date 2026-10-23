@@ -1,17 +1,18 @@
-# Trading Risk and Execution Review Handoff
+# Risk handoff
 
-**Candidate:** `improvement/offline-foundation-v1`  
-**Candidate SHA:** `6049e11fe11e8ac3e39b5bb7b06019476ed26337`  
-**Selected baseline:** `main` at `8feb36db91d7144b4a190a302634ddd30c449c0b`
+## Structured fields
 
-This was a read-only review with no broker, account, order, or live/paper-trading access.
+- status: Blocked
+- starting_commit: `8a1160db7379a3014b9c2d8743983b9720f3b2fe`
+- candidate_commit: none
+- files_changed: none
+- commands_executed: none
+- test_result: not executed
 
-## Assessment
+## Findings
 
-The candidate is not approved for live or paper trading. Account-currency sizing, broker-volume compliance, costs, slippage, gap risk, aggregate open risk, daily loss, drawdown, shared JPY exposure, protective-order lifecycle, reconciliation, duplicate submission prevention, restart handling, emergency shutdown, and complete execution lifecycle are not demonstrated. `Execution.taketrade()` is reported as a stub. GBPJPY runtime handling conflicts with GBPUSD filenames, and no independent USDJPY stream is present.
+No candidate implementation exists for this increment. No tests were run, no candidate workflow evidence was generated, and no broker connection or account access occurred. Risk controls were not verified against a candidate.
 
-The review partially supports explicit MT5 startup in `main.py`, but `Execution.py` remains import-sensitive. FVG evidence supports unchanged selected tests; order-block, liquidity, 2R, and risk-limit preservation were not independently verified from complete source. The passing offline tests do not establish trading readiness.
+The baseline identifies incomplete execution, sizing, portfolio controls, reconciliation, symbol/data provenance, and shared GBPJPY/USDJPY JPY-exposure handling. Previously exposed credentials remain a repository-history risk and must be rotated; credential values are not reproduced here.
 
-Prior credential exposure is a residual risk. Current values are not reproduced; they are `[REDACTED]` if referenced. Credentials may remain in repository history and must be rotated.
-
-**Recommendation:** reject for live and paper trading. Continue offline engineering only.
+Real-money trading is not authorised. No live or demo trading readiness is established.

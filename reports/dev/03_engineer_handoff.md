@@ -1,5 +1,20 @@
 # Engineer handoff
 
-The engineer source returned no data: it was unable to read the complete current file contents required by STEP 1. Therefore, no additional engineer-confirmed implementation details are available from that handoff.
+## Structured fields
 
-The supplied record nevertheless identifies candidate application commit `6049e11fe11e8ac3e39b5bb7b06019476ed26337`; this SHA comes from the supplied candidate and QA/run evidence, not from a completed engineer handoff. Credential values are not reproduced and are represented as `[REDACTED]` where relevant.
+- status: Blocked
+- starting_commit: `8a1160db7379a3014b9c2d8743983b9720f3b2fe`
+- candidate_commit: none
+- files_changed: none
+- commands_executed: none
+- test_result: not executed
+
+## Blocker
+
+Complete current-file reads for `ProjectMayhem/Liquidity.py`, `ProjectMayhem/OrderBlockAnalysis.py`, and `tests/test_engineering.py` were not obtained because URL-reader requests failed. The mandatory complete-read gate was not satisfied. Implementation stopped; no files were edited and no commit was created.
+
+No credentials were accessed or printed. The supplied handoff mentions secret names only; credential values are not reproduced here.
+
+## Milestones
+
+M1 through M7 were not started. No broker connection was made.

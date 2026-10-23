@@ -1,7 +1,15 @@
 # Baseline record
 
-The supplied baseline record selected `main` at `8feb36db91d7144b4a190a302634ddd30c449c0b` as the safe application baseline. It records `fix/offline-testability-m15-append` as present at `56ec343c43d11c576bd72f280336a142195d36a0` and `improvement/offline-foundation-v1` at `6049e11fe11e8ac3e39b5bb7b06019476ed26337`.
+The supplied baseline record is reproduced in the consolidated report below. It records the selected baseline, repository inspection, branch state, workflow evidence, defect findings, and known limitations. No files were written during the inspection.
 
-The audit branch contributes reports rather than newer application code. Audit commit `8c33a68fb5c46c510170050c5262c8ef74dfa020` changed six report files; the audit branch later advanced to `56ec343c43d11c576bd72f280336a142195d36a0`. Application Python files, the offline test, requirements, and docs were reported identical to `main`; the workflow differed, with `main` retaining the relevant push trigger.
+## Selected baseline
 
-The latest supplied workflow evidence listed run `39777938055` at the development head with success, but this report distinguishes supplied run evidence from independently retrieved evidence. Credential values are intentionally omitted and any credential material encountered is treated as `[REDACTED]`.
+`main` at `f9b530de4f48c7bc94a3c92fd068afec03f4b787`.
+
+## Current development head
+
+`improvement/offline-foundation-v1` at `8a1160db7379a3014b9c2d8743983b9720f3b2fe`.
+
+## Delivery status
+
+No implementation candidate is supplied for this increment. Engineering is blocked, so this report commit is report-only.
