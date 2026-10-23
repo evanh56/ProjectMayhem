@@ -1,6 +1,7 @@
 import csv
 import os
 from pathlib import Path
+#import MetaTrader5 as mt
 
 import pandas as pd
 
@@ -18,20 +19,66 @@ def _mt5():
     return mt
 
 
+import os
+
+
 def connect_broker():
-    mt = _mt5()
-    login = os.getenv("MT5_LOGIN")
-    password = os.getenv("MT5_PASSWORD")
-    server = os.getenv("MT5_SERVER")
-    missing = [name for name, value in (("MT5_LOGIN", login), ("MT5_PASSWORD", password), ("MT5_SERVER", server)) if not value]
+    settings = {
+        "MT5_LOGIN": os.getenv("MT5_LOGIN"),
+        "MT5_PASSWORD": os.getenv("MT5_PASSWORD"),
+        "MT5_SERVER": os.getenv("MT5_SERVER"),
+    }
+
+    missing = [
+        name for name, value in settings.items()
+        if value is None or not value.strip()
+    ]
+
     if missing:
-        raise RuntimeError("Missing required broker configuration: " + ", ".join(missing))
+        raise RuntimeError(
+            "Missing required broker configuration: " + ", ".join(missing)
+        )
+
+    try:
+        login = int(settings["MT5_LOGIN"].strip())
+    except ValueError as exc:
+        raise RuntimeError("MT5_LOGIN must be a numeric account number") from exc
+
+    mt = _mt5()
+
     if not mt.initialize():
-        raise RuntimeError("MetaTrader5 initialization failed")
-    if not mt.login(int(login), password=password, server=server):
+        error = mt.last_error()
         mt.shutdown()
-        raise RuntimeError("MetaTrader5 authentication failed")
-    return mt
+        raise RuntimeError(f"MetaTrader5 initialization failed: {error}")
+
+    try:
+        if not mt.login(
+            login,
+            password=settings["MT5_PASSWORD"],
+            server=settings["MT5_SERVER"].strip(),
+        ):
+            raise RuntimeError(
+                f"MetaTrader5 authentication failed: {mt.last_error()}"
+            )
+
+        account = mt.account_info()
+
+        if account is None:
+            raise RuntimeError(
+                f"Unable to retrieve account information: {mt.last_error()}"
+            )
+
+        if account.login != login:
+            raise RuntimeError("Connected MT5 account does not match MT5_LOGIN")
+
+        if account.trade_mode != mt.ACCOUNT_TRADE_MODE_DEMO:
+            raise RuntimeError("Only an MT5 demo account is permitted")
+
+        return mt
+
+    except Exception:
+        mt.shutdown()
+        raise
 
 
 def shutdown_broker(mt=None):
