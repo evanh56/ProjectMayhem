@@ -1,42 +1,30 @@
-# Consolidated implementation report — offline foundation v1
+# Consolidated implementation report
 
-**Date:** 2026-10-22  
-**Repository:** `evanh56/ProjectMayhem`  
-**Development branch:** `improvement/offline-foundation-v1`  
-**Base:** `main`
+IMPLEMENTATION OUTCOME: Engineering blocked / No implementation delivered
+TESTING OUTCOME: Not testable: no identifiable candidate
+DELIVERY OUTCOME: Report commit pending; pull-request result pending
+READINESS CLASSIFICATION: Blocked by a named external prerequisite — no broker connection or demo trade was evidenced; a Windows host with an MT5 terminal, secret names `MT5_LOGIN`, `MT5_PASSWORD`, `MT5_SERVER`, and expected-account settings are required.
 
-## Status
+## Problem and changed behaviour
 
-**Implemented, sandbox tests passed, awaiting GitHub run.**
+The intended increment concerns a demo-only trading-system foundation: safe offline imports, explicit broker boundaries, H1/M15 strategy sequencing, provenance-aware data handling, conservative risk controls, execution lifecycle, reconciliation, and runtime controls. The supplied engineering handoff is blocked at the mandatory complete-read gate. Therefore no application or test behavior changed in this increment. This commit is report-only and is not a completed development increment.
 
-This status is intentionally not “Tests passed”: the delivery evidence supplied a successful Actions run whose head equals the candidate, but it was not independently retrieved in this delivery. Under the stated rule, a completed successful GitHub Actions run must be shown as successful before the increment can be called fully validated.
+QA and risk validated no candidate. No claim of error-free operation is made.
 
-## Concrete problem and changed behaviour
+## Baseline and SHAs
 
-The increment addresses offline testability and a narrow M15 writer defect. Previously, broker setup and credential-related configuration were reported in import-time application flow, and empty M15 input could mutate output files. The candidate separates `main.py` broker startup behind explicit invocation, obtains MT5 configuration from environment variables, and returns before writing when the frame is empty. Non-empty initial and incremental writes retain the reported existing columns, formatting, paths, and append semantics. The patch does not redesign strategy logic or authorise trading.
+- Baseline ref: `main`
+- Baseline SHA: `f9b530de4f48c7bc94a3c92fd068afec03f4b787`
+- Starting commit reported by researcher: `f9b530de4f48c7bc94a3c92fd068afec03f4b787`
+- Starting commit reported by engineer, QA, risk, and run check: `8a1160db7379a3014b9c2d8743983b9720f3b2fe`
+- Candidate commit: none
+- Current development branch head before this report-only commit: `8a1160db7379a3014b9c2d8743983b9720f3b2fe`
 
-QA also found that `ProjectMayhem/Execution.py` still imports MT5 at module import, so the broader all-module offline-import goal remains incomplete.
+The report-only commit SHA will be recorded after the write. It differs from the application candidate because no application candidate exists.
 
-## Baselines and revisions
+## Files changed
 
-- Selected baseline `main`: `8feb36db91d7144b4a190a302634ddd30c449c0b`.
-- Audit branch `fix/offline-testability-m15-append`: `56ec343c43d11c576bd72f280336a142195d36a0`.
-- Development branch before this report-only commit: `6049e11fe11e8ac3e39b5bb7b06019476ed26337`.
-- Candidate application commit: `6049e11fe11e8ac3e39b5bb7b06019476ed26337`.
-- Exact tested revision in independent QA sandbox: `6049e11fe11e8ac3e39b5bb7b06019476ed26337`.
-- Supplied GitHub Actions run: `39777938055`, head `6049e11fe11e8ac3e39b5bb7b06019476ed26337`, success; not independently retrieved here.
-- This report-only commit is separate from the application candidate; its SHA is recorded in the delivery response after commit creation.
-
-## Files changed by the application candidate
-
-The supplied handoffs identify application/test changes involving:
-
-- `ProjectMayhem/main.py`
-- `tests/test_engineering.py`
-
-The candidate was reviewed alongside existing files including `ProjectMayhem/Execution.py`, `ProjectMayhem/FairValueGap.py`, `ProjectMayhem/OrderBlockAnalysis.py`, `ProjectMayhem/Liquidity.py`, `ProjectMayhem/Strategy.py`, `tests/test_offline.py`, and `.github/workflows/offline-tests.yml`. The exact candidate diff file list was not independently returned by the engineer handoff.
-
-This delivery changes exactly these report paths:
+No application or test files were changed. This report-only commit writes exactly:
 
 - `reports/dev/01_baseline_record.md`
 - `reports/dev/02_researcher_handoff.md`
@@ -46,67 +34,165 @@ This delivery changes exactly these report paths:
 - `reports/dev/06_run_check.md`
 - `reports/dev/07_consolidated_implementation_report.md`
 
-No path outside `reports/dev/` is intentionally changed by this report-only commit, and it must not trigger the offline workflow under the stated path filters.
+## Handoff structured fields
 
-## Handoff summaries
+### Researcher
 
-- **Researcher:** authorised only import isolation, explicit broker startup, credential removal, M15 empty-write repair, regression tests, and discovery; strategy behaviours and ambiguous writer semantics must remain unchanged.
-- **Engineer:** source returned no data, so no complete engineer-confirmed file-level implementation report exists.
-- **QA:** nine sandbox tests passed after installing the pinned pandas dependency; main import isolation and empty writer repair worked, but Execution import isolation and broader coverage remain deficient.
-- **Risk:** reject live and paper trading. Sizing, execution lifecycle, protective orders, portfolio controls, shared JPY exposure, failure recovery, and credential rotation are not evidenced.
-- **Run check:** source returned no data; supplied run evidence exists but was not independently retrieved in this delivery.
+- status: Research-stage specification and engineering handoff; no implementation or trading authorization
+- starting_commit: `main` at `f9b530de4f48c7bc94a3c92fd068afec03f4b787`
+- candidate_commit: none - research stage
+- files_changed: none
+- commands_executed: none
+- test_result: not applicable
+- blockers: provenance mismatch, unresolved strategy decisions, incomplete execution/risk controls, no current-commit test execution, and no chronological performance evidence
 
-## Execution evidence kept in separate groups
+### Engineer
 
-### (a) Engineer sandbox runs
+- status: Blocked
+- starting_commit: `8a1160db7379a3014b9c2d8743983b9720f3b2fe`
+- candidate_commit: none
+- files_changed: none
+- commands_executed: none
+- test_result: not executed
+- blocker: complete reads for `ProjectMayhem/Liquidity.py`, `ProjectMayhem/OrderBlockAnalysis.py`, and `tests/test_engineering.py` were not obtained
 
-No engineer sandbox run data was returned. The engineer handoff returned no data for the required complete source review. No engineer test result is asserted.
+### QA
 
-### (b) Independent QA sandbox runs
+- status: Blocked
+- starting_commit: `8a1160db7379a3014b9c2d8743983b9720f3b2fe`
+- candidate_commit: none
+- files_changed: none
+- commands_executed: none
+- test_result: not executed
+- blocker: no identifiable candidate
 
-QA ran on a copy of commit `6049e11fe11e8ac3e39b5bb7b06019476ed26337`, not in GitHub Actions. Python was `3.11.6`; `pandas==2.2.3` was installed. The first attempt failed with `ModuleNotFoundError: No module named 'pandas'`; the subsequent discovery command ran 9 tests in 0.022 seconds and returned `OK`. Passed cases covered the writer, main import, scoped credential check, FVG regressions, and syntax. This is sandbox evidence only.
+### Risk
 
-### (c) GitHub Actions runs on the candidate SHA
+- status: Blocked
+- starting_commit: `8a1160db7379a3014b9c2d8743983b9720f3b2fe`
+- candidate_commit: none
+- files_changed: none
+- commands_executed: none
+- test_result: not executed
+- blocker: no candidate implementation to inspect
 
-Supplied evidence lists run `39777938055`, completed with success, on head `6049e11fe11e8ac3e39b5bb7b06019476ed26337`. The run was not independently retrieved by this delivery, no rerun or dispatch occurred, and no artifact evidence was supplied here. Therefore the status remains awaiting GitHub run rather than fully validated.
+### Run check
 
-### (d) Statically inspected checks
+- status: Blocked
+- starting_commit: `8a1160db7379a3014b9c2d8743983b9720f3b2fe`
+- candidate_commit: none
+- files_changed: none
+- commands_executed: none
+- test_result: not executed
+- manual workflow instructions: none supplied
 
-The workflow was reported to have `workflow_dispatch`, push filtering to the development branch and application/test paths, Python 3.11, pinned dependency installation, unittest discovery, read-only contents permission, disabled credential persistence, timeout, and always-uploaded CI result artifacts. Static review also found `Execution.py`’s module-level MT5 import, narrow import and credential test scopes, and lack of direct existing-file byte-preservation coverage. Risk review found no demonstrated production-grade sizing, execution, protective-order, portfolio, or recovery controls.
+## Component register
+
+| Component | Current evidence/status | Priority |
+|---|---|---:|
+| Broker/import boundary | `main.py` is offline-oriented; `Execution.py` remains MT5-import-sensitive | P0 |
+| Data/provenance | GBPUSD-named files conflict with runtime GBPJPY; USDJPY stream absent | P0 |
+| H1/M15 strategy | Specification exists; no candidate implementation | P0 |
+| FVG/order block/liquidity | Existing conventions and unresolved definitions; no candidate validation | P0 |
+| Risk/sizing | 2% ceiling is specified; sizing and portfolio controls not demonstrated | P0 |
+| Execution lifecycle | Execution path incomplete; `taketrade()` reported as a stub | P0 |
+| Reconciliation/runtime controls | Not implemented or verified | P0 |
+| Tests/CI | Prior successful runs exist only for earlier application SHAs; no candidate run | P1 |
+| Credentials/security | Earlier exposure remains in repository history and requires rotation | P0 |
+| Trading authorization | Demo-only specification; no approval or trade evidence | P0 |
+
+## Prioritised backlog
+
+1. Obtain complete reads for the three blocked files and restart engineering Step 1.
+2. Remove broker-sensitive imports from every production module and add import-isolation coverage.
+3. Establish and verify GBPJPY and USDJPY data provenance and metadata; reject ambiguous legacy fixtures.
+4. Resolve Q01–Q11 and version deterministic H1/M15 strategy definitions.
+5. Implement fail-closed risk sizing, aggregate risk, shared JPY exposure, stops, 2R targets, and portfolio limits.
+6. Implement demo-account guard, order checks, protective-order verification, uncertain-response handling, and reconciliation.
+7. Add single-instance lock, heartbeat, journaling, emergency stop, restart behavior, and safe wrapper boundary.
+8. Run sandbox tests and a completed GitHub Actions run whose head equals the candidate SHA.
+9. Conduct broker-connected demo validation only on the required Windows/MT5 environment; obtain explicit authorization before any demo trade.
+10. Rotate previously exposed credentials and do not reuse historical values.
+
+## Specification matrix and unresolved decisions
+
+| Area | Confirmed/proposed status |
+|---|---|
+| Instruments | GBPJPY and USDJPY are confirmed scope; provenance is blocked |
+| Timeframes | H1 context and M15 confirmation; completed-candle timing is proposed |
+| Risk | Maximum 2% immutable; 0.5% demo default proposed |
+| Reward/risk | Initial target exactly 2R |
+| Frequency | 2–3 trades/day is an aspiration, never a quota |
+| FVG | Three-candle normalized interval; causal formation at candle-three close proposed |
+| Order block | Body-only/full-range variants unresolved; body-only proposed default |
+| Liquidity | Swing/sweep definition and stop buffer unresolved; fail closed without qualifying stop |
+| Direction/entry | Same-direction H1/M15; bid/ask executable entry proposed |
+| Sessions/holding | IANA sessions and six-hour maximum proposed, not approved |
+| Re-entry/portfolio | Conservative limits proposed; unresolved Q09–Q10 |
+| Research/evaluation | Chronological development/validation/final evaluation required; Q11 unresolved |
+
+Unresolved decision groups: Q01–Q04 zone/direction/boundaries/timing; Q05–Q08 entry/liquidity/sessions/holding; Q09–Q10 portfolio/re-entry; Q11 evidence and promotion criteria.
+
+Immutable constraints remain: maximum 2% per trade, exactly 2R initial target, no 5% escalation, no 4R target, no forced trade quota, fail-closed undefined controls, no stop widening, no averaging down, shared JPY exposure checks, and demo-only operation.
+
+## Execution evidence
+
+### Engineer sandbox runs
+
+None. The engineer reported `commands_executed: none` and `test_result: not executed`.
+
+### Independent QA sandbox runs
+
+None. QA reported `commands_executed: none` and `test_result: not executed`.
+
+### GitHub Actions runs on the candidate SHA
+
+None, because candidate commit is `none`. Earlier successful runs are not candidate evidence: run `39777938055` tested `6049e11fe11e8ac3e39b5bb7b06019476ed26337`, while the current development head before this report was `8a1160db7379a3014b9c2d8743983b9720f3b2fe`. The report-only commit is not a development candidate and must not be represented as tested application code.
+
+### Statically inspected checks
+
+The baseline inspection reported current `main.py` lazy MT5 loading and environment-variable configuration, corrected empty-input handling, one-row DataFrame append behavior, and a scoped credential-literal check. It also reported that `Execution.py` remains import-sensitive. These are baseline observations, not candidate validation. Credential values are omitted and any credential-like values are represented as `[REDACTED]` if encountered.
+
+### Broker evidence
+
+None. No broker connection, account state, order check, order, or demo trade was evidenced.
+
+## Measurements
+
+No new software measurements were collected for this increment. The supplied baseline reports repository file sizes and prior workflow/run metadata, but no new tests or candidate measurements were produced.
+
+## Trading-performance findings
+
+None supported. No chronological experiment, backtest artifact, demo result, trade, win rate, drawdown, expectancy, or profitability evidence was supplied for this increment.
 
 ## Remaining limitations and blockers
 
-- All-module import isolation is incomplete because `Execution.py` imports MT5 at module load.
-- Import regression coverage checks only `main.py`.
-- Credential scanning is not repository-wide. Earlier credential exposure must be treated as `[REDACTED]` and credentials still need rotation; exposure may remain in Git history.
-- Existing-file byte preservation for empty incremental input is not directly tested.
-- Duplicate, ordering, malformed-header, overlap, and legacy-file behaviours remain uncharacterised.
-- Instrument identity remains inconsistent: GBPJPY runtime handling versus GBPUSD filenames; no independent USDJPY stream is present.
-- Execution is incomplete or insufficiently validated; `taketrade()` is reported as a stub.
-- Account-currency sizing, broker constraints, costs, slippage, gap risk, aggregate risk, daily loss, drawdown, shared JPY exposure, protective orders, reconciliation, restart recovery, duplicate prevention, and emergency shutdown are not evidenced.
-- No live or paper trading approval is provided.
+- Engineering is blocked by incomplete required source reads; no candidate exists.
+- QA and risk validated no candidate.
+- All-module offline import safety remains incomplete.
+- GBPUSD-named data and runtime GBPJPY identity are inconsistent; USDJPY data is absent and provenance is insufficient.
+- Strategy definitions and Q01–Q11 decisions remain unresolved.
+- Execution, sizing, portfolio controls, reconciliation, and runtime controls are not demonstrated.
+- Previously exposed MT5 credentials remain in repository history and still need rotation. Credential values are intentionally not reproduced.
+- No demo or live authorization is supported; real-money trading is not authorised.
+- A Windows host with an MT5 terminal and configured secret names `MT5_LOGIN`, `MT5_PASSWORD`, `MT5_SERVER`, plus expected-account settings, is an external prerequisite for broker-connected demo validation.
 
-## Backlog carried forward
+## Install/configure/launch/check/stop/restart commands
 
-1. Move `Execution.py` MT5 import behind explicit runtime use or define an approved adapter boundary.
-2. Add import-isolation coverage for every application module.
-3. Extend safe credential scanning to authorised repository locations without printing secrets; rotate any exposed credentials and address history exposure.
-4. Add an existing-file byte-preservation regression test for empty incremental writes.
-5. Characterise writer duplicate, ordering, malformed-header, timestamp, and legacy-file behaviour without inventing changes.
-6. Build deterministic account-currency risk and broker-volume tests, including GBPJPY/USDJPY and shared JPY exposure.
-7. Implement and test order lifecycle, protective orders, stale data, rejects, partial fills, idempotency, disconnects, restart recovery, reconciliation, and emergency shutdown before any trading consideration.
-8. Resolve instrument/data identity and deferred strategy questions Q01–Q11 separately from this repair.
+The handoffs supplied no exact commands or expected startup output. Therefore none can be reported without invention. No commands were executed. Secret values, if encountered, would be replaced with `[REDACTED]`; none are written here.
 
-## Usage, cost, and next increment
+## CrewAI Run button
 
-Usage and cost are **unverified**; no metering, billing, or usage evidence was supplied. No broker or trading usage occurred in the reviewed evidence.
+The CrewAI Run button runs the development crew only unless the engineer has implemented an authenticated start/status/stop wrapper. The engineer handoff does not report such a wrapper, so no trading-process control is evidenced.
 
-**Next increment:** complete offline import isolation across every application module, add repository-authorised credential-scan coverage without exposing values, and add the existing-file byte-preservation writer regression. Run the resulting application commit in GitHub Actions and verify that the successful run head exactly matches that candidate SHA. Do not alter strategy formulas or enable broker execution.
+## Usage and cost
 
-## Run-check instructions
+Usage and cost are unverified; no measurements or billing evidence were supplied.
 
-The run-check handoff returned no manual instructions. The supplied owner-pasted run URL was `https://github.com/evanh56/ProjectMayhem/actions/runs/39777938055`; it is recorded as supplied evidence only.
+## Defined next increment
 
-## Delivery record
+Obtain complete reads for `ProjectMayhem/Liquidity.py`, `ProjectMayhem/OrderBlockAnalysis.py`, and `tests/test_engineering.py`, restart the mandatory engineering read gate, then implement and test only after a valid candidate scope is established. Preserve the existing application corrections, add no broker access by default, and require a completed successful GitHub Actions run whose head exactly matches the candidate SHA before calling the increment fully validated.
 
-The branch was checked before writing. One report-only commit was requested on `improvement/offline-foundation-v1`, based on `main`, containing exactly the seven `reports/dev/` files above. The report commit SHA is returned separately after the GitHub commit operation. A pull request is opened from `improvement/offline-foundation-v1` into `main`; it is not merged. The report commit SHA differs from the application candidate SHA by purpose and must not be treated as an application validation revision.
+## Manual workflow instructions
+
+The run-check handoff supplied none. No workflow dispatch or rerun was performed.
