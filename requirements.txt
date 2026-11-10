@@ -1,0 +1,2 @@
+pandas==2.2.3
+MetaTrader5==5.0.4874; sys_platform == "win32"

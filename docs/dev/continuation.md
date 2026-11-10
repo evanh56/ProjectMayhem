@@ -1,8 +1,8 @@
 # Continuation
 
 - Date: 2026-11-10
-- starting_sha: f79ff392a13d3561b1341c7f4e7d4c200e97282c
-- Completed: first runnable offline-foundation checkpoint; removed tracked `.env` and Python caches; added environment contract, lazy demo-account guard, deterministic H1/M15 strategy interface, fail-closed risk geometry, paper intent executor, and module CLI.
-- Remaining: validate checkpoint; implement MT5 symbol discovery/history collection, completed-candle CSV pipeline, broker constraints/margin/portfolio gates, protected demo order path, runtime journal/heartbeat/lock/reconnect, and fixtures.
-- Diagnostics: not yet run against candidate checkpoint.
-- Blockers: MetaTrader5 is Windows-only and was not installed in offline validation; no broker connection was attempted.
+- starting_sha: 0ab82dc16e6c76fdfef76ab134953d12348c81f9
+- Completed: restored package entry point and relative imports; added Windows runtime requirements; added completed UTC candle normalization, MT5 symbol discovery/history adapter, and run-once collection to strategy/risk/paper-intent flow; tracked cache paths were already absent at starting checkpoint and remain ignored.
+- Remaining: validate candidate; deduplicated CSV persistence per symbol/timeframe; spread/freshness/gap checks; broker margin and portfolio gates; protected MT5 demo execution adapter; journal heartbeat lock reconnect/reconciliation shutdown; fixtures and broader tests.
+- Diagnostics: candidate validation pending; MT5 not installed or contacted offline.
+- Blockers: broker-connected MT5 path is written but not executed in sandbox; MetaTrader5 is Windows-only.
