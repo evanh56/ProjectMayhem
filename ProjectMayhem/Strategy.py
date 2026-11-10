@@ -8,7 +8,7 @@ pos = 0
 ob_15 = 0
 
 
-import Execution as exe
+from . import Execution
 def check_trading_time(start_time_str, end_time_str):
     current_time = datetime.now().time()
     start_time = time.fromisoformat(start_time_str)
