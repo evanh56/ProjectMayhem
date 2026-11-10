@@ -1,39 +1,24 @@
-#Taking a trade
-import MetaTrader5 as mt
-import pandas as pd
+"""Fail-closed paper execution. Live MT5 submission is deliberately not enabled here."""
+from __future__ import annotations
+from dataclasses import dataclass, asdict
+import json
+from pathlib import Path
+from uuid import uuid4
 
-def price_to_pip(symbol, live_price):
+@dataclass(frozen=True)
+class Intent:
+    intent_id: str; symbol: str; side: str; entry: float; stop: float; target: float; volume: float
 
-    if 'JPY' in symbol:
-        acc_info = mt.account_info()
-        acc_bal = acc_info.balance
-        pip_val = acc_bal / 100
-        pips = 7
-        pip_unit = (pip_val / live_price)
-        lot_size = round(pip_unit * pips, 2)
-        return lot_size
+class PaperExecutor:
+    def __init__(self, directory="ProjectMayhem/logs"):
+        self.path = Path(directory) / "order_intents.jsonl"; self.path.parent.mkdir(parents=True, exist_ok=True)
+    def submit(self, symbol, side, entry, stop, target, volume):
+        intent = Intent(uuid4().hex, symbol, side, entry, stop, target, volume)
+        with self.path.open("a", encoding="utf-8") as f: f.write(json.dumps(asdict(intent), sort_keys=True) + "\n")
+        return intent
 
-    if 'GBPUSD' in symbol:
-        acc_info = mt.account_info()
-        acc_bal = acc_info.balance
-        pip_val = acc_bal / 100
-        pips = 7
-        pip_unit = (pip_val / live_price)
-        lot_size = round(pip_unit * pips, 2)
-        return lot_size
-ticker = 'GBPJPY'
-#pricedif =
-#mt.initialize()
-#acc_info = mt.account_info()
-#acc_bal = acc_info.balance
+def taketrade(*args, **kwargs):
+    raise RuntimeError("live execution is disabled; use PaperExecutor")
 
-#qty = price_to_pip(ticker, acc_bal)
-
-Sl = 350
-
-def taketrade():
-    print("Work in progress")
-    return
-
-def main(candle_of_joy):
-    return
+def main(*args, **kwargs):
+    return None
